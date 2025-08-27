@@ -49,7 +49,6 @@ login_manager.login_view = 'auth.login'
 jwt = JWTManager(app)
 
 # Import model agar bisa dibuat di DB
-from models import User
 with app.app_context():
     db.create_all()
 
