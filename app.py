@@ -1,105 +1,77 @@
 import os
 import logging
 from datetime import timedelta
-
 from dotenv import load_dotenv
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_jwt_extended import JWTManager
 from flask_socketio import SocketIO
 
-# ============================================================
-# 1. Load Environment Variables
-# ============================================================
+# Load environment variables
 load_dotenv()
 
-# ============================================================
-# 2. Initialize Flask App
-# ============================================================
+# Inisialisasi Flask
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")  # agar bisa akses dari frontend
+socketio = SocketIO(app, cors_allowed_origins="*")
 
-# ============================================================
-# 3. Configuration
-# ============================================================
+# Konfigurasi dari .env
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "default-secret")
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
-    "DATABASE_URL", "sqlite:///C:/webgis-bansos/data/webgis.db"
-)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data/webgis.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Brevo / Email
 app.config['BREVO_API_KEY'] = os.getenv("BREVO_API_KEY")
 app.config['BREVO_SENDER_EMAIL'] = os.getenv("BREVO_SENDER_EMAIL")
+app.config['MAPBOX_API_KEY'] = os.getenv("MAPBOX_API_KEY")
+app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY", "default-jwt")
 
-# Session
+# Session config
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = False  # set True kalau pakai HTTPS
+app.config['SESSION_COOKIE_SECURE'] = False
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 app.config['SESSION_REFRESH_EACH_REQUEST'] = True
 
-# API Keys
-app.config['MAPBOX_API_KEY'] = os.getenv("MAPBOX_API_KEY")
-
-# JWT
-app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY", "jwt-secret")
-
-# ============================================================
-# 4. Extensions
-# ============================================================
-db = SQLAlchemy(app)
-login_manager = LoginManager(app)
-login_manager.login_view = 'auth.login'  # route login
-jwt = JWTManager(app)
-
-# ============================================================
-# 5. Logging
-# ============================================================
-log_dir = "C:/webgis-bansos/logs"
-os.makedirs(log_dir, exist_ok=True)
+# Logging
+if not os.path.exists("logs"):
+    os.makedirs("logs")
 logging.basicConfig(
-    filename=os.path.join(log_dir, 'app.log'),
+    filename='logs/app.log',
     level=logging.DEBUG,
-    format='%(asctime)s [%(levelname)s] %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# ============================================================
-# 6. Models
-# ============================================================
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
+# Inisialisasi ekstensi
+db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'auth.login'
+jwt = JWTManager(app)
 
-    def __repr__(self):
-        return f"<User {self.username}>"
+# Import model agar bisa dibuat di DB
+from models import User
+with app.app_context():
+    db.create_all()
 
+# Register blueprint
+from routes.auth import auth_bp
+from routes.main import main_bp
+app.register_blueprint(auth_bp, url_prefix="/auth")
+app.register_blueprint(main_bp)
 
-# ============================================================
-# 7. Blueprints / Routes
-# ============================================================
-@app.route("/")
-def index():
-    return {"message": "Welcome to WebGIS Bansos API"}
+# SocketIO event
+@socketio.on('connect')
+def handle_connect():
+    logger.info("Client connected via SocketIO")
+    print("Client connected")
 
+@socketio.on('disconnect')
+def handle_disconnect():
+    logger.info("Client disconnected from SocketIO")
+    print("Client disconnected")
 
-@app.route("/ping")
-def ping():
-    return {"status": "ok"}
-
-
-# ============================================================
-# 8. Main Entrypoint
-# ============================================================
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()  # otomatis bikin tabel kalau belum ada
-    logger.info("Starting WebGIS Bansos App...")
-    socketio.run(app, host="0.0.0.0", port=5000, debug=True)
-
+    socketio.run(app, debug=True)
 
 
 DATA_BANSOS_FILE = os.path.join(os.path.dirname(__file__), 'data', 'penerima.json')
