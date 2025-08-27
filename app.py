@@ -1359,4 +1359,3 @@ if __name__ == '__main__':
                 for acc in accounts_log:
                     f.write(f"Username: {acc['username']}\nEmail: {acc['email']}\nPassword: {acc['password']}\nRole: admin\n\n")
             logger.info("10 akun admin telah dibuat dan disimpan di {}".format(ACCOUNTS_LOG_FILE))
-    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
