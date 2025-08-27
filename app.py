@@ -58,11 +58,14 @@ jwt = JWTManager(app)
 with app.app_context():
     db.create_all()
 
-# Register blueprint
-from routes.auth import auth_bp
-from routes.main import main_bp
-app.register_blueprint(auth_bp, url_prefix="/auth")
-app.register_blueprint(main_bp)
+# api_routes.py
+from flask import Blueprint, jsonify
+
+api_bp = Blueprint("api", __name__)
+
+@api_bp.route("/ping")
+def ping():
+    return jsonify({"msg": "pong"})
 
 # SocketIO event
 @socketio.on("connect")
