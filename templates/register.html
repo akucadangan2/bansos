@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - WebGIS Bansos</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white font-poppins">
+    <div class="min-h-screen flex items-center justify-center px-4">
+        <div class="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-md transform transition-all hover:scale-105">
+            <div class="flex justify-center mb-6">
+                <img src="/static/images/Kemensos.png" alt="Kemensos Logo" class="h-16">
+            </div>
+            <h2 class="text-3xl font-semibold text-orange-500 mb-6 text-center">Register Pengguna</h2>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="bg-red-600 p-3 rounded-lg mb-6 text-sm text-center">
+                        {{ messages[0] }}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            <form method="POST" action="{{ url_for('register') }}">
+                <div class="mb-5">
+                    <label class="block text-orange-300 text-sm font-medium mb-2">Username</label>
+                    <input type="text" name="username" class="w-full p-3 rounded-lg bg-gray-700 border border-orange-500 text-white text-sm focus:ring-2 focus:ring-orange-400 transition" placeholder="Masukkan username" required>
+                </div>
+                <div class="mb-5">
+                    <label class="block text-orange-300 text-sm font-medium mb-2">Password</label>
+                    <input type="password" name="password" class="w-full p-3 rounded-lg bg-gray-700 border border-orange-500 text-white text-sm focus:ring-2 focus:ring-orange-400 transition" placeholder="Masukkan password" required>
+                </div>
+                <div class="mb-5">
+                    <label class="block text-orange-300 text-sm font-medium mb-2">Role</label>
+                    <select name="role" class="w-full p-3 rounded-lg bg-gray-700 border border-orange-500 text-white text-sm focus:ring-2 focus:ring-orange-400 transition">
+                        <option value="admin">Admin</option>
+                        <option value="pegawai">Pegawai</option>
+                        <option value="public">Pengguna Umum</option>
+                    </select>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-orange-300 text-sm font-medium mb-2">Wilayah (opsional untuk Pegawai)</label>
+                    <select name="region_id" class="w-full p-3 rounded-lg bg-gray-700 border border-orange-500 text-white text-sm focus:ring-2 focus:ring-orange-400 transition">
+                        <option value="">Tidak ada</option>
+                        {% for region in regions %}
+                            <option value="{{ region.id }}">{{ region.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white p-3 rounded-lg text-sm font-semibold transition-all duration-300">Register</button>
+            </form>
+            <a href="{{ url_for('manage_users') }}" class="block text-center text-orange-300 hover:text-orange-400 text-sm mt-4 transition">Kembali ke Manajemen Pengguna</a>
+        </div>
+    </div>
+</body>
+</html>

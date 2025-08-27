@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGIS Kemensos - Kebencanaan</title>
+    <link rel="icon" type="image/x-icon" href="/static/images/favicon.png">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" />
+    <!-- Fallback lokal untuk Leaflet CSS -->
+    <link rel="stylesheet" href="/static/css/leaflet.css" onerror="console.error('Failed to load local Leaflet CSS')" />
+    <!-- Leaflet JS dengan defer -->
+    <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+    <!-- Fallback lokal untuk Leaflet JS -->
+    <script defer src="/static/js/leaflet.js" onerror="console.error('Failed to load local Leaflet JS')"></script>
+    <!-- Leaflet MarkerCluster -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+    <script defer src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <!-- Leaflet Heat -->
+    <script defer src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <!-- Tailwind, Chart.js, dan Plugin Datalabels -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script src="/static/js/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #1a202c; color: #ffffff; margin: 0; }
+        #map { height: calc(100vh - 12rem); width: 100%; position: relative; }
+        #map-error { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: red; font-size: 16px; text-align: center; display: none; }
+        .sidebar { position: fixed; top: 12rem; right: 0; width: 20rem; height: calc(100vh - 12rem); background: rgba(45,55,72,0.95); backdrop-filter: blur(10px); transition: transform 0.3s; z-index: 40; }
+        .sidebar-closed { transform: translateX(20rem); }
+        .modal { display: none; z-index: 60; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .neon-glow { box-shadow: 0 0 8px rgba(255,69,0,0.6), 0 0 12px rgba(0,149,255,0.4); }
+        .chart-container { background: linear-gradient(135deg, #1e3a8a, #3b0764); border-radius: 0.75rem; padding: 1rem; border: 2px solid #ff4500; box-shadow: 0 0 15px rgba(255,69,0,0.4); transition: transform 0.3s; }
+        .chart-container:hover { transform: scale(1.02); }
+        .btn-gradient { background: linear-gradient(90deg, #ff4500, #0095ff); }
+        .btn-gradient:hover { background: linear-gradient(90deg, #ff6500, #00b0ff); transform: scale(1.1); }
+        .tab-active { background: rgba(255,69,0,0.2); border-bottom: 2px solid #ff4500; }
+        .chart-canvas { max-height: 120px !important; width: 100% !important; }
+        .preview-img { max-width: 75px; max-height: 75px; object-fit: cover; border-radius: 0.25rem; border: 1px solid #ff4500; }
+        .data-table { max-height: 500px; overflow-y: auto; border: 2px solid #ff4500; border-radius: 0.5rem; background: linear-gradient(180deg, #1a202c, #2d3748); }
+        .data-table th, .data-table td { padding: 0.75rem; border-bottom: 2px solid #4b5563; }
+        .data-table th { background: linear-gradient(90deg, #ff4500, #0095ff); color: white; font-weight: 700; }
+        .data-table tr:hover { background-color: #2d3748; transform: scale(1.01); transition: transform 0.2s; }
+        .badge-ringan { background-color: #48bb78; color: white; padding: 0.3rem 0.6rem; border-radius: 0.25rem; box-shadow: 0 0 5px #48bb78; }
+        .badge-sedang { background-color: #ecc94b; color: black; padding: 0.3rem 0.6rem; border-radius: 0.25rem; box-shadow: 0 0 5px #ecc94b; }
+        .badge-berat { background-color: #f56565; color: white; padding: 0.3rem 0.6rem; border-radius: 0.25rem; box-shadow: 0 0 5px #f56565; }
+        #simpan-btn, #batal-btn, #cari-koordinat, #simpan-posko-btn, #batal-posko-btn, #close-posko-input-modal { pointer-events: auto; cursor: pointer; z-index: 100; }
+        .notification { position: fixed; top: 20px; right: 20px; z-index: 70; background: #ff4500; color: white; padding: 10px 20px; border-radius: 5px; display: none; }
+        .notification.active { display: block; }
+        .transition-panel { transition: height 0.3s ease, opacity 0.3s ease; }
+        .hidden { height: 0; opacity: 0; }
+        #gallery-modal .gallery-img { max-height: 200px; object-fit: cover; border-radius: 0.5rem; }
+        .notification-bell { position: relative; display: inline-block; margin-left: 0.25rem; }
+        .notification-bell .badge { position: absolute; top: -8px; right: -8px; padding: 2px 6px; border-radius: 50%; background: #dc3545; color: white; font-size: 10px; }
+        nav { z-index: 50; }
+    </style>
+    {{ rbac_script | safe }}
+    <script defer src="/static/js/bencana.js"></script>
+    <script defer src="/static/js/bencana2.js"></script>
+</head>
+<body class="min-h-screen bg-gray-900 font-inter text-white">
+    <nav class="bg-black bg-opacity-90 backdrop-blur-md shadow-[0_0_10px_rgba(255,69,0,0.5)] fixed w-full">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between h-12 items-center">
+            <div class="flex items-center space-x-2">
+                <button id="toggle-sidebar" class="p-1 rounded-lg hover:bg-orange-600">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+                <img src="/static/images/Kemensos.png" alt="Logo Kemensos" class="w-9 h-9 rounded-full">
+                <span class="text-xl font-bold">Kebencanaan By Kementrian Sosial RI</span>
+            </div>
+            <div class="flex gap-2">
+                <button id="notif-btn" class="p-1 rounded-lg hover:bg-orange-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                    </svg>
+                </button>
+                <a href="/" class="px-1 py-0.5 rounded-lg text-xs hover:bg-orange-600 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 005.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    Bantuan Sosial
+                </a>
+                <a href="/bencana" class="px-1 py-0.5 rounded-lg text-xs hover:bg-orange-600 flex items-center gap-1 active">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                    </svg>
+                    Bencana
+                </a>
+                <a href="/fasilitas" class="px-1 py-0.5 rounded-lg text-xs hover:bg-orange-600 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    Fasilitas
+                </a>
+                <a href="/layanan" class="px-1 py-0.5 rounded-lg text-xs hover:bg-orange-600 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                    Layanan
+                <a href="/lansia" class="px-1 py-0.5 rounded-lg text-xs hover:bg-orange-600 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    Lansia
+                <a href="/lansia_individu" class="px-1 py-0.5 rounded-lg text-xs hover:bg-orange-600 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    Manajemen LSA 
+                </a>
+                {% if user_info.is_authenticated and user_info.role == 'admin' %}
+                    <a href="/pengajuan" class="px-1 py-0.5 rounded-lg text-xs hover:bg-orange-600 flex items-center gap-1" id="review-submissions-link">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        Review Pengajuan
+                        <span class="notification-bell">
+                            <i class="fas fa-bell"></i>
+                            <span id="pending-count" class="badge"></span>
+                        </span>
+                    </a>
+                {% endif %}
+                {% if user_info.is_authenticated %}
+                    <a href="/akun" class="px-1 py-0.5 rounded-lg text-xs hover:bg-orange-600 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        Akun
+                    </a>
+                    <a href="/auth?tab=submissions" class="px-1 py-0.5 rounded-lg text-xs hover:bg-orange-600 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        Pengajuan Saya
+                    </a>
+                    <a href="/logout" class="px-1 py-0.5 rounded-lg text-xs hover:bg-orange-600 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                        Logout
+                    </a>
+                {% else %}
+                    <a href="/auth?tab=login" class="px-1 py-0.5 rounded-lg text-xs hover:bg-orange-600 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                        </svg>
+                        Login
+                    </a>
+                    <a href="/auth?tab=register" class="px-1 py-0.5 rounded-lg text-xs hover:bg-orange-600 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                        </svg>
+                        Register
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <header class="bg-gradient-to-r from-red-800 to-blue-600 pt-14 pb-2 px-3">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="text-lg font-bold uppercase mb-2">Monitoring Kebencanaan</h1>
+            <div class="grid grid-cols-3 gap-2">
+                <div class="chart-container"><h3 class="text-xs font-medium text-orange-100 mb-1 text-center">Jenis Bencana</h3><canvas id="miniJenisChart" class="chart-canvas"></canvas></div>
+                <div class="chart-container"><h3 class="text-xs font-medium text-orange-100 mb-1 text-center">Korban</h3><canvas id="miniKorbanChart" class="chart-canvas"></canvas></div>
+                <div class="chart-container"><h3 class="text-xs font-medium text-orange-100 mb-1 text-center">Keparahan</h3><canvas id="miniKeparahanChart" class="chart-canvas"></canvas></div>
+            </div>
+        </div>
+    </header>
+    <div class="flex max-w-7xl mx-auto mt-2 h-[calc(100vh-12rem)]">
+        <div id="sidebar" class="w-1/2 bg-gray-900 bg-opacity-95 backdrop-blur-md p-4 h-[calc(100vh-12rem)] overflow-y-auto">
+            <div class="grid grid-cols-4 gap-2 mb-4">
+                <button id="input-btn" class="btn-gradient btn-square rounded-lg neon-glow transition-transform" title="Input Bencana"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg></button>
+                <button id="posko-input-btn" class="btn-gradient btn-square rounded-lg neon-glow transition-transform" title="Input Posko"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 005.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg></button>
+                <button id="export-btn" class="btn-gradient btn-square rounded-lg neon-glow transition-transform" title="Export"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></button>
+                <button id="filter-btn" class="btn-gradient btn-square rounded-lg neon-glow transition-transform" title="Filter"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707v3.586a1 0 01-.293.707l-2 2a1 0 01-1.414 0l-2-2a1 0 01-.293-.707v-3.586a1 0 00-.293-.707L3.293 7.293A1 0 013 6.586V4z"/></svg></button>
+                <button id="dashboard-btn" class="btn-gradient btn-square rounded-lg neon-glow transition-transform" title="Dashboard"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg></button>
+                <button id="posko-btn" class="btn-gradient btn-square rounded-lg neon-glow transition-transform" title="Posko"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 005.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg></button>
+                <button id="laporan-btn" class="btn-gradient btn-square rounded-lg neon-glow transition-transform" title="Laporan"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg></button>
+                <button id="heatmap-btn" class="btn-gradient btn-square rounded-lg neon-glow transition-transform" title="Heatmap"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg></button>
+            </div>
+            <div id="sidebar-content" class="space-y-4">
+                <div id="map-theme-section">
+                    <h2 class="text-xs font-bold text-orange-400 mb-1">Tema Peta</h2>
+                    <select id="map-theme" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs">
+                        <option value="dark">Dark</option>
+                        <option value="light">Light</option>
+                        <option value="satellite">Satellite</option>
+                        <option value="retro">Retro</option>
+                    </select>
+                </div>
+                <div id="filter-section" class="hidden transition-panel">
+                    <h2 class="text-xs font-bold text-orange-400 mb-1">Filter</h2>
+                    <label class="block text-xs text-orange-300">Jenis</label>
+                    <select id="filter_jenis" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs">
+                        <option value="">Semua</option>
+                        <option value="Gempa bumi">Gempa bumi</option>
+                        <option value="Banjir">Banjir</option>
+                        <option value="Tanah longsor">Tanah longsor</option>
+                        <option value="Kebakaran">Kebakaran</option>
+                        <option value="Erupsi gunung api">Erupsi gunung api</option>
+                        <option value="Bencana sosial">Bencana sosial</option>
+                        <option value="Cuaca ekstrem">Cuaca ekstrem</option>
+                        <option value="Tsunami">Tsunami</option>
+                    </select>
+                    <label class="block text-xs text-orange-300 mt-1">Keparahan</label>
+                    <select id="filter_keparahan" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs">
+                        <option value="">Semua</option>
+                        <option value="Ringan">Ringan</option>
+                        <option value="Sedang">Sedang</option>
+                        <option value="Berat">Berat</option>
+                    </select>
+                    <label class="block text-xs text-orange-300 mt-1">Provinsi</label>
+                    <select id="filter_provinsi" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs">
+                        <option value="">Semua</option>
+                        <option value="Lampung">Lampung</option>
+                        <option value="DKI Jakarta">DKI Jakarta</option>
+                        <option value="Sulawesi Selatan">Sulawesi Selatan</option>
+                        <option value="Kalimantan Selatan">Kalimantan Selatan</option>
+                    </select>
+                    <label class="block text-xs text-orange-300 mt-1">Tanggal Mulai</label>
+                    <input type="date" id="filter_start_date" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs">
+                    <label class="block text-xs text-orange-300 mt-1">Tanggal Selesai</label>
+                    <input type="date" id="filter_end_date" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs">
+                </div>
+                <div id="dashboard-section" class="hidden transition-panel">
+                    <h2 class="text-xs font-bold text-orange-400 mb-1">Dashboard</h2>
+                    <div class="chart-container"><h3 class="text-xs font-medium text-orange-100 mb-1 text-center">Jenis Bencana</h3><canvas id="jenisChart" class="chart-canvas"></canvas></div>
+                    <div class="chart-container"><h3 class="text-xs font-medium text-orange-100 mb-1 text-center">Korban</h3><canvas id="korbanChart" class="chart-canvas"></canvas></div>
+                    <div class="chart-container"><h3 class="text-xs font-medium text-orange-100 mb-1 text-center">Keparahan</h3><canvas id="keparahanChart" class="chart-canvas"></canvas></div>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-gray-800 p-1 rounded-lg"><span class="font-bold text-orange-400">Total Bencana</span><p id="total-bencana">0</p></div>
+                        <div class="bg-gray-800 p-1 rounded-lg"><span class="font-bold text-orange-400">Korban Meninggal</span><p id="total-meninggal">0</p></div>
+                        <div class="bg-gray-800 p-1 rounded-lg"><span class="font-bold text-orange-400">Posko Aktif</span><p id="total-posko">0</p></div>
+                        <div class="bg-gray-800 p-1 rounded-lg"><span class="font-bold text-orange-400">Bantuan</span><p id="total-bantuan">0</p></div>
+                    </div>
+                </div>
+                <div id="data-section">
+                    <h2 class="text-xs font-bold text-orange-400 mb-2">Data Bencana</h2>
+                    <div class="data-table">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr class="bg-gray-800 sticky top-0">
+                                    <th class="text-left">Jenis</th>
+                                    <th class="text-left">Lokasi</th>
+                                    <th class="text-left">Waktu</th>
+                                    <th class="text-left">Keparahan</th>
+                                    <th class="text-left">Korban</th>
+                                    <th class="text-left">Gambar</th>
+                                    <th class="text-left">File</th>
+                                    <th class="text-left">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="data-table-body">
+                                <!-- Data akan diisi oleh JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="map-container" class="w-1/2 bg-gray-800 rounded-xl overflow-hidden">
+            <div id="map" class="h-full w-full">
+                <div id="map-error" class="map-error">Gagal memuat peta. Periksa koneksi internet atau coba muat ulang halaman.</div>
+            </div>
+        </div>
+    </div>
+    <div id="input-modal" class="modal">
+        <div class="bg-gray-900 p-4 rounded-xl shadow-[0_0_15px_rgba(255,69,0,0.5)] w-full max-w-sm max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-sm font-bold text-orange-400 uppercase" id="input-modal-title">Input Bencana</h2>
+                <button id="close-input-modal" class="text-orange-500 hover:text-orange-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div class="flex gap-1 mb-2">
+                <button id="tab-basic" class="tab flex-1 p-1 text-xs text-orange-300 hover:text-orange-400 tab-active">Info Dasar</button>
+                <button id="tab-korban" class="tab flex-1 p-1 text-xs text-orange-300 hover:text-orange-400">Korban</button>
+                <button id="tab-bantuan" class="tab flex-1 p-1 text-xs text-orange-300 hover:text-orange-400">Bantuan</button>
+                <button id="tab-dokumentasi" class="tab flex-1 p-1 text-xs text-orange-300 hover:text-orange-400">Dokumentasi</button>
+            </div>
+            <form id="input-form" class="space-y-2">
+                <input type="hidden" id="edit-id">
+                <input type="hidden" id="latitude" name="latitude">
+                <input type="hidden" id="longitude" name="longitude">
+                <div id="basic-section">
+                    <div><label class="block text-xs text-orange-300">Jenis Bencana</label><select id="jenis_bencana" name="jenis_bencana" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" required><option value="">Pilih Jenis</option><option value="Gempa bumi">Gempa bumi</option><option value="Banjir">Banjir</option><option value="Tanah longsor">Tanah longsor</option><option value="Kebakaran">Kebakaran</option><option value="Erupsi gunung api">Erupsi gunung api</option><option value="Bencana sosial">Bencana sosial</option><option value="Cuaca ekstrem">Cuaca ekstrem</option><option value="Tsunami">Tsunami</option></select></div>
+                    <div><label class="block text-xs text-orange-300">Nama Lokasi</label><input type="text" id="lokasi_nama" name="lokasi_nama" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" required></div>
+                    <div><label class="block text-xs text-orange-300">Alamat</label><div class="flex items-center gap-2"><textarea id="alamat" name="alamat" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" rows="2" required></textarea><a id="alamat-link" href="#" target="_blank" class="text-orange-500 hover:text-orange-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></a></div></div>
+                    <div><label class="block text-xs text-orange-300">Waktu Kejadian</label><input type="datetime-local" id="waktu_kejadian" name="waktu_kejadian" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" required></div>
+                    <div><label class="block text-xs text-orange-300">Keparahan</label><select id="tingkat_keparahan" name="tingkat_keparahan" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" required><option value="">Pilih Keparahan</option><option value="Ringan">Ringan</option><option value="Sedang">Sedang</option><option value="Berat">Berat</option></select></div>
+                    <div><label class="block text-xs text-orange-300">Luas Terdampak (km²)</label><input type="number" id="luas_terdampak" name="luas_terdampak" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" min="0" step="0.1" required></div>
+                    <div><label class="block text-xs text-orange-300">Kebutuhan Mendesak</label><input type="text" id="kebutuhan_mendesak" name="kebutuhan_mendesak" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" placeholder="Obat-obatan, air bersih"></div>
+                </div>
+                <div id="korban-section" class="hidden">
+                    <div><label class="block text-xs text-orange-300">Meninggal</label><input type="number" id="korban_meninggal" name="korban_meninggal" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" min="0" required></div>
+                    <div><label class="block text-xs text-orange-300">Luka Berat</label><input type="number" id="korban_luka_berat" name="korban_luka_berat" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" min="0" required></div>
+                    <div><label class="block text-xs text-orange-300">Luka Ringan</label><input type="number" id="korban_luka_ringan" name="korban_luka_ringan" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" min="0" required></div>
+                    <div><label class="block text-xs text-orange-300">Pengungsi</label><input type="number" id="korban_pengungsi" name="korban_pengungsi" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" min="0" required></div>
+                    <div><label class="block text-xs text-orange-300">Rumah Rusak Berat</label><input type="number" id="rumah_rusak_berat" name="rumah_rusak_berat" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" min="0" required></div>
+                    <div><label class="block text-xs text-orange-300">Rumah Rusak Sedang</label><input type="number" id="rumah_rusak_sedang" name="rumah_rusak_sedang" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" min="0" required></div>
+                    <div><label class="block text-xs text-orange-300">Rumah Rusak Ringan</label><input type="number" id="rumah_rusak_ringan" name="rumah_rusak_ringan" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" min="0" required></div>
+                    <div><label class="block text-xs text-orange-300">Fasilitas Umum Rusak</label><input type="text" id="fasilitas_umum" name="fasilitas_umum" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" placeholder="Sekolah: 2"></div>
+                </div>
+                <div id="bantuan-section" class="hidden">
+                    <div id="bantuan-list">
+                        <div class="bantuan-item bg-gray-800 p-2 rounded-lg mb-2">
+                            <label class="block text-xs text-orange-300">Jenis Bantuan</label>
+                            <input type="text" name="bantuan_jenis" class="bantuan-jenis w-full p-1 rounded-lg bg-gray-700 border border-orange-500 text-white text-xs" placeholder="Logistik">
+                            <label class="block text-xs text-orange-300 mt-1">Instansi</label>
+                            <input type="text" name="bantuan_instansi" class="bantuan-instansi w-full p-1 rounded-lg bg-gray-700 border border-orange-500 text-white text-xs" placeholder="BNPB">
+                            <label class="block text-xs text-orange-300 mt-1">Jumlah</label>
+                            <input type="text" name="bantuan_jumlah" class="bantuan-jumlah w-full p-1 rounded-lg bg-gray-700 border border-orange-500 text-white text-xs" placeholder="100 paket">
+                            <label class="block text-xs text-orange-300 mt-1">Waktu</label>
+                            <input type="date" name="bantuan_waktu" class="bantuan-waktu w-full p-1 rounded-lg bg-gray-700 border border-orange-500 text-white text-xs">
+                        </div>
+                    </div>
+                    <button type="button" id="tambah-bantuan" class="bg-orange-500 hover:bg-orange-600 text-white p-1 rounded-lg text-xs w-full">Tambah Bantuan</button>
+                </div>
+                <div id="dokumentasi-section" class="hidden">
+                    <div><label class="block text-xs text-orange-300">Foto (maksimal 10)</label><input type="file" id="foto" name="foto" accept="image/*" multiple class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs"><div id="foto-preview" class="flex gap-2 mt-1"></div></div>
+                    <div><label class="block text-xs text-orange-300 mt-1">Dokumen Laporan (PDF)</label><input type="file" id="laporan" name="laporan" accept=".pdf" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs"></div>
+                </div>
+                <div class="flex gap-2 mt-2">
+                    <button type="button" id="cari-koordinat" class="bg-gray-700 hover:bg-gray-600 text-white p-1 rounded-lg text-xs hover:scale-105 neon-glow">Cari Koordinat</button>
+                    <button type="submit" id="simpan-btn" class="btn-gradient text-white p-1 rounded-lg text-xs hover:scale-105 neon-glow">Simpan</button>
+                    <button type="button" id="batal-btn" class="bg-red-600 hover:bg-red-700 text-white p-1 rounded-lg text-xs hover:scale-105 neon-glow">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="posko-input-modal" class="modal">
+        <div class="bg-gray-900 p-4 rounded-xl shadow-[0_0_15px_rgba(255,69,0,0.5)] max-w-sm w-full max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-sm font-bold text-orange-400 uppercase">Input Posko</h2>
+                <button id="close-posko-input-modal" class="text-orange-500 hover:text-orange-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <form id="posko-input-form" class="space-y-2">
+                <input type="hidden" id="posko-bencana-id">
+                <input type="hidden" id="posko_latitude" name="posko_latitude">
+                <input type="hidden" id="posko_longitude" name="posko_longitude">
+                <div><label class="block text-xs text-orange-300">Nama Posko</label><input type="text" id="posko_nama" name="posko_nama" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" required></div>
+                <div><label class="block text-xs text-orange-300">Tipe Posko</label><select id="posko_tipe" name="posko_tipe" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" required><option value="">Pilih Tipe</option><option value="Pengungsian">Pengungsian</option><option value="Dapur Umum">Dapur Umum</option><option value="Medis">Medis</option></select></div>
+                <div><label class="block text-xs text-orange-300">Alamat</label><textarea id="posko_alamat" name="posko_alamat" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" rows="2" required></textarea></div>
+                <div><label class="block text-xs text-orange-300">Jumlah Pengungsi</label><input type="number" id="posko_pengungsi" name="posko_pengungsi" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" min="0" required></div>
+                <div class="flex gap-2 mt-2">
+                    <button type="button" id="cari-koordinat-posko" class="bg-gray-700 hover:bg-gray-600 text-white p-1 rounded-lg text-xs hover:scale-105 neon-glow">Cari Koordinat</button>
+                    <button type="submit" id="simpan-posko-btn" class="btn-gradient text-white p-1 rounded-lg text-xs hover:scale-105 neon-glow">Simpan</button>
+                    <button type="button" id="batal-posko-btn" class="bg-red-600 hover:bg-red-700 text-white p-1 rounded-lg text-xs hover:scale-105 neon-glow">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="posko-modal" class="modal">
+        <div class="bg-gray-900 p-4 rounded-xl shadow-[0_0_15px_rgba(255,69,0,0.5)] max-w-sm w-full max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-sm font-bold text-orange-400 uppercase">Posko Bantuan</h2>
+                <button id="close-posko-modal" class="text-orange-500 hover:text-orange-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div id="posko-table" class="space-y-2"></div>
+            <div class="mt-2 flex justify-end"><button id="tutup-posko-btn" class="bg-red-600 hover:bg-red-700 text-white p-1 rounded-lg text-xs hover:scale-105 neon-glow">Tutup</button></div>
+        </div>
+    </div>
+    <div id="laporan-modal" class="modal">
+        <div class="bg-gray-900 p-4 rounded-xl shadow-[0_0_15px_rgba(255,69,0,0.5)] max-w-sm w-full max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-sm font-bold text-orange-400 uppercase">Laporan Masyarakat</h2>
+                <button id="close-laporan-modal" class="text-orange-500 hover:text-orange-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <form id="laporan-form" class="space-y-2">
+                <div><label class="block text-xs text-orange-300">Nama</label><input type="text" id="pelapor_nama" name="pelapor_nama" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" required></div>
+                <div><label class="block text-xs text-orange-300">Alamat</label><textarea id="pelapor_alamat" name="pelapor_alamat" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" rows="2" required></textarea></div>
+                <div><label class="block text-xs text-orange-300">Deskripsi</label><textarea id="pelapor_deskripsi" name="pelapor_deskripsi" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs" rows="3" required></textarea></div>
+                <div><label class="block text-xs text-orange-300">Foto</label><input type="file" id="pelapor_foto" name="pelapor_foto" accept="image/*" class="w-full p-1 rounded-lg bg-gray-800 border border-orange-500 text-white text-xs"><div id="pelapor-foto-preview" class="mt-1"></div></div>
+                <div class="flex gap-2 mt-2">
+                    <button type="submit" id="simpan-laporan-btn" class="btn-gradient text-white p-1 rounded-lg text-xs hover:scale-105 neon-glow">Kirim</button>
+                    <button type="button" id="batal-laporan-btn" class="bg-red-600 hover:bg-red-700 text-white p-1 rounded-lg text-xs hover:scale-105 neon-glow">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="notif-modal" class="modal">
+        <div class="bg-gray-900 p-4 rounded-xl shadow-[0_0_15px_rgba(255,69,0,0.5)] max-w-sm w-full max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-sm font-bold text-orange-400 uppercase">Notifikasi</h2>
+                <button id="tutup-notif-btn" class="text-orange-500 hover:text-orange-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div id="notif-table" class="space-y-2"></div>
+            <div class="mt-2 flex justify-end"><button id="close-notif-btn" class="bg-red-600 hover:bg-red-700 text-white p-1 rounded-lg text-xs hover:scale-105 neon-glow">Tutup</button></div>
+        </div>
+    </div>
+    <div id="notification" class="notification">Input Bencana diaktifkan. Isi form di modal.</div>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        async function updatePendingCount() {
+            try {
+                const response = await fetch('/api/pending_submissions');
+                const data = await response.json();
+                const pendingCount = document.getElementById('pending-count');
+                if (pendingCount) {
+                    pendingCount.textContent = data.count > 0 ? data.count : '';
+                }
+            } catch (error) {
+                console.error('Error fetching pending submissions:', error);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            updatePendingCount();
+            window.refreshMapAndTable = function() {
+                if (typeof window.loadBencanaData === 'function') {
+                    window.loadBencanaData();
+                } else {
+                    window.location.reload();
+                }
+            };
+        });
+    </script>
+</body>
+</html>

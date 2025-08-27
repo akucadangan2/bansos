@@ -1,0 +1,189 @@
+{
+  "type": "LansiaCollection",
+  "lansia": [
+    {
+      "nik": "2231242343454364",
+      "nama": "Mr Test Data6",
+      "usia": 61,
+      "status_sosial": "Kurang Mampu",
+      "alamat": "7VXP+JWJ, Jl. Raya Kudus - Colo, Watulumpang, Kajar, Kec. Dawe, Kabupaten Kudus, Jawa Tengah 59353",
+      "koordinat": [
+        110.86762,
+        -6.735497
+      ],
+      "keluarga": [
+        "08217777777"
+      ],
+      "tempat_tinggal": "Rumah Pribadi",
+      "kondisi_kesehatan": [],
+      "keuangan": [],
+      "kegiatan": []
+    },
+    {
+      "nik": "4129472964986128",
+      "nama": "ADP Test Data",
+      "usia": 79,
+      "status_sosial": "Mampu",
+      "alamat": "9QVV+4G6, RT.05/RW.01, Paledang, Kecamatan Bogor Tengah, Kota Bogor, Jawa Barat 16122",
+      "koordinat": [
+        106.79273,
+        -6.588566
+      ],
+      "keluarga": [
+        "08217777778"
+      ],
+      "tempat_tinggal": "Rumah Pribadi",
+      "kondisi_kesehatan": [],
+      "keuangan": [],
+      "kegiatan": []
+    },
+    {
+      "nik": "1212134567888555",
+      "nama": "FFF TEST DATA ANWAR",
+      "usia": 99,
+      "status_sosial": "Kurang Mampu",
+      "alamat": "85G2+75X, Laskap, Kec. Malili, Kabupaten Luwu Timur, Sulawesi Selatan 92981",
+      "koordinat": [
+        121.11538,
+        -2.619323
+      ],
+      "keluarga": [
+        "Sustrino"
+      ],
+      "tempat_tinggal": "Rumah Pribadi",
+      "kondisi_kesehatan": [],
+      "keuangan": [],
+      "kegiatan": []
+    },
+    {
+      "nik": "1212134567888553",
+      "nama": "FFF TEST DATA ANss",
+      "usia": 68,
+      "status_sosial": "DTKS",
+      "alamat": "P565+89J, Banjar Pemuteran, Candikuning, Kec. Baturiti, Kabupaten Tabanan, Bali 82191",
+      "koordinat": [
+        115.18567,
+        -8.324695
+      ],
+      "keluarga": [
+        "Sustrinr"
+      ],
+      "tempat_tinggal": "Rumah Pribadi",
+      "kondisi_kesehatan": [],
+      "keuangan": [],
+      "kegiatan": []
+    },
+    {
+      "nik": "5675685678658568",
+      "nama": "asdasdad",
+      "usia": 78,
+      "status_sosial": "Mampu",
+      "alamat": "Jl. Gembrung No.220, Lingkungan Watu Ulo R, Bakungan, Kec. Glagah, Kabupaten Banyuwangi, Jawa Timur 68431",
+      "koordinat": [
+        114.31095,
+        -8.21845
+      ],
+      "keluarga": [
+        "scdasdasd"
+      ],
+      "tempat_tinggal": "Rumah Pribadi",
+      "kondisi_kesehatan": [],
+      "keuangan": [],
+      "kegiatan": []
+    },
+    {
+      "nik": "8888888888888888",
+      "nama": "MICHAEL Test Data",
+      "usia": 62,
+      "status_sosial": "Kurang Mampu",
+      "alamat": "H83C+RG9, Jl. H. Dimurthala Kuta Alam No.1, Kuta Alam, Kec. Kuta Alam, Kota Banda Aceh, Aceh 23127",
+      "koordinat": [
+        95.32674,
+        5.557839
+      ],
+      "keluarga": [
+        "08217777771"
+      ],
+      "tempat_tinggal": "Panti",
+      "kondisi_kesehatan": [],
+      "keuangan": [],
+      "kegiatan": []
+    },
+    {
+      "nik": "9999999999999999",
+      "nama": "Mr xxxxxx",
+      "usia": 63,
+      "status_sosial": "Mampu",
+      "alamat": "47F4+VFQ, Jl. Kuda Laut, Klakublik, Distrik Sorong, Kota Sorong, Papua Bar. 98411",
+      "koordinat": [
+        131.28134,
+        -0.882779
+      ],
+      "keluarga": [
+        "ARIL"
+      ],
+      "tempat_tinggal": "Lainnya",
+      "kondisi_kesehatan": [],
+      "keuangan": [],
+      "kegiatan": [
+        {
+          "id": "g5jlifpkd",
+          "nama_kegiatan": "MLbb",
+          "tanggal_kegiatan": "2025-07-29",
+          "status_kegiatan": "Terjadwal"
+        }
+      ]
+    }
+  ],
+  "policies": [],
+  "rehabilitations": [
+    {
+      "id": "26ejtfby6",
+      "nama_balai": "xxxxxx",
+      "layanan_balai": "xxxxxxxxxxxx"
+    },
+    {
+      "id": "b7xh08gms",
+      "nama_balai": "zzzzzzzzzzzzz",
+      "layanan_balai": "zzzzzzzzzzzzzzzzzzzz"
+    }
+  ],
+  "monitorings": [],
+  "partnerships": [],
+  "disasters": [
+    {
+      "id": "4wbbpgl9o",
+      "kejadian_bencana": "PAPUA",
+      "lokasi_bencana": "Kandangan, 68488, Pesanggaran, Banyuwangi, East Java, Indonesia",
+      "koordinat": [
+        114.09814,
+        -8.573312
+      ],
+      "kebutuhan_bencana": "SANDANG"
+    }
+  ],
+  "productives": [
+    {
+      "id": "5uud8hzo8",
+      "nama_pelatihan": "xxxx",
+      "tanggal_pelatihan": "2025-07-29"
+    }
+  ],
+  "advocacies": [
+    {
+      "id": "8zfuafwmq",
+      "nama_kampanye": "SSSSS TEST DATA",
+      "jadwal_kampanye": "2025-07-25"
+    }
+  ],
+  "hluns": [],
+  "trainings": [],
+  "researches": [
+    {
+      "id": "8aa6j78v4",
+      "judul_penelitian": "xxxx",
+      "ringkasan_penelitian": "gggggg"
+    }
+  ],
+  "balai": []
+}

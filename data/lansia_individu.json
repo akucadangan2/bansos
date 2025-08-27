@@ -1,0 +1,243 @@
+{
+  "type": "LansiaCollection",
+  "lansia": [
+    {
+      "nik": "2324001010101011",
+      "nama": "SUPARNO",
+      "usia": 149,
+      "kondisi_kesehatan": [
+        "Penyakit Jantung"
+      ],
+      "status_sosial": "Rentan Miskin",
+      "alamat": "Jl. DR. Sutomo No.16, Randusari, Kec. Semarang Sel., Kota Semarang, Jawa Tengah 50244",
+      "status_monitoring": "Aktif",
+      "evaluasi_layanan": "Kurang",
+      "dtks_status": "Pengusulan Sedang Diproses",
+      "riwayat_atensi": [
+        {
+          "program": "xxxx",
+          "status": "Sedang Berjalan",
+          "tanggal": "2025-07-23"
+        }
+      ],
+      "koordinat": [
+        110.41026346385479,
+        -6.990725389000618
+      ]
+    },
+    {
+      "nik": "2324001012342019",
+      "nama": "RANO KARNO",
+      "usia": 66,
+      "kondisi_kesehatan": [
+        "Lainnya"
+      ],
+      "status_sosial": "Fakir Miskin",
+      "alamat": "Jl. Pendidikan, Ciputat, Kec. Ciputat, Kota Tangerang Selatan, Banten 15411",
+      "status_monitoring": "Aktif",
+      "evaluasi_layanan": "Memuaskan",
+      "dtks_status": "Belum Terdaftar",
+      "riwayat_atensi": [],
+      "koordinat": [
+        106.7104572057724,
+        -6.301653783638038
+      ]
+    },
+    {
+      "nik": "1234567890101121",
+      "nama": "JUSTIN BIEBER",
+      "usia": 60,
+      "kondisi_kesehatan": [
+        "Gangguan Penglihatan"
+      ],
+      "status_sosial": "Mampu",
+      "alamat": "Jl. Pemiri, 8 Ilir, Kec. Ilir Tim. II, Kota Palembang, Sumatera Selatan 30961",
+      "status_monitoring": "Aktif",
+      "evaluasi_layanan": "Kurang",
+      "dtks_status": "Terdaftar",
+      "riwayat_atensi": [],
+      "koordinat": [
+        104.7568504884839,
+        -2.9888241506071376
+      ]
+    },
+    {
+      "nik": "7463642482784928",
+      "nama": "DONALD TRUMP",
+      "usia": 66,
+      "kondisi_kesehatan": [],
+      "status_sosial": "Fakir Miskin",
+      "alamat": "44HJ+XWX, Sungailiat, Sungai Liat, Kabupaten Bangka, Kepulauan Bangka Belitung 33215",
+      "status_monitoring": "Selesai",
+      "evaluasi_layanan": "Memuaskan",
+      "dtks_status": "Belum Terdaftar",
+      "riwayat_atensi": [],
+      "koordinat": [
+        106.11919909715652,
+        -1.8477273570025246
+      ]
+    },
+    {
+      "alamat": "Jl. Jatirawamangun, Jati, Kec. Pulo Gadung, Kota Jakarta Timur, Daerah Khusus Ibukota Jakarta 13220",
+      "dtks_status": "Pengusulan Sedang Diproses",
+      "evaluasi_layanan": "Kurang",
+      "kondisi_kesehatan": [
+        "Penyakit Jantung"
+      ],
+      "koordinat": [
+        106.89794428646564,
+        -6.192088907681589
+      ],
+      "nama": "MICHAEL YOHANES",
+      "nik": "3532646666600110",
+      "riwayat_atensi": [],
+      "status_monitoring": "Tertunda",
+      "status_sosial": "Rentan Miskin",
+      "usia": 64
+    },
+    {
+      "alamat": "RT.05/RW.02, Cikadu, Kec. Pelabuhanratu, Kabupaten Sukabumi, Jawa Barat 43364",
+      "dtks_status": "Terdaftar",
+      "evaluasi_layanan": "Memuaskan",
+      "kondisi_kesehatan": [
+        "Gangguan Penglihatan"
+      ],
+      "koordinat": [
+        117.8902853,
+        -2.4833826
+      ],
+      "nama": "MR XXXXX",
+      "nik": "1212134567888000",
+      "riwayat_atensi": [],
+      "status_monitoring": "Aktif",
+      "status_sosial": "Fakir Miskin",
+      "usia": 99
+    },
+    {
+      "alamat": "Jl. Centra, Mulyoharjo II, Mulyoharjo, Kec. Jepara, Kabupaten Jepara, Jawa Tengah 59431",
+      "dtks_status": "Pengusulan Sedang Diproses",
+      "evaluasi_layanan": "Memuaskan",
+      "kondisi_kesehatan": [
+        "Gangguan Penglihatan"
+      ],
+      "koordinat": [
+        110.66721,
+        -6.591012
+      ],
+      "nama": "Mr Test Datad",
+      "nik": "2498239479276491",
+      "riwayat_atensi": [],
+      "status_monitoring": "Aktif",
+      "status_sosial": "Fakir Miskin",
+      "usia": 100
+    },
+    {
+      "alamat": "Loktabat Utara, Kec. Banjarbaru Utara, Kota Banjar Baru, Kalimantan Selatan 70714",
+      "dtks_status": "Pengusulan Sedang Diproses",
+      "evaluasi_layanan": "Memuaskan",
+      "kondisi_kesehatan": [
+        "Diabetes"
+      ],
+      "koordinat": [
+        114.8311,
+        -3.441659
+      ],
+      "nama": "ANDRIQ",
+      "nik": "2324001012342001",
+      "riwayat_atensi": [],
+      "status_monitoring": "Aktif",
+      "status_sosial": "Fakir Miskin",
+      "usia": 98
+    },
+    {
+      "alamat": "9QVV+4G6, RT.05/RW.01, Paledang, Kecamatan Bogor Tengah, Kota Bogor, Jawa Barat 16122",
+      "dtks_status": "Belum Terdaftar",
+      "evaluasi_layanan": "Memuaskan",
+      "kondisi_kesehatan": [
+        "Diabetes"
+      ],
+      "koordinat": [
+        106.79273,
+        -6.588566
+      ],
+      "nama": "Test Dataa89",
+      "nik": "3435645764575675",
+      "riwayat_atensi": [],
+      "status_monitoring": "Aktif",
+      "status_sosial": "Fakir Miskin",
+      "usia": 87
+    },
+    {
+      "alamat": "Jl. Gembrung No.220, Lingkungan Watu Ulo R, Bakungan, Kec. Glagah, Kabupaten Banyuwangi, Jawa Timur 68431",
+      "dtks_status": "Terdaftar",
+      "evaluasi_layanan": "Memuaskan",
+      "kondisi_kesehatan": [
+        "Penyakit Jantung"
+      ],
+      "koordinat": [
+        114.31095,
+        -8.21845
+      ],
+      "nama": "Test Dataa86",
+      "nik": "3435645764575674",
+      "riwayat_atensi": [],
+      "status_monitoring": "Aktif",
+      "status_sosial": "Fakir Miskin",
+      "usia": 85
+    },
+    {
+      "alamat": "47F4+VFQ, Jl. Kuda Laut, Klakublik, Distrik Sorong, Kota Sorong, Papua Bar. 98411",
+      "dtks_status": "Terdaftar",
+      "evaluasi_layanan": "Memuaskan",
+      "kondisi_kesehatan": [
+        "Lainnya"
+      ],
+      "koordinat": [
+        131.28134,
+        -0.882779
+      ],
+      "nama": "Aril Noah",
+      "nik": "0000000000000000",
+      "riwayat_atensi": [],
+      "status_monitoring": "Selesai",
+      "status_sosial": "Mampu",
+      "usia": 78
+    },
+    {
+      "alamat": "Gg. Gn. Agung, Rawagaru, Sidanegara, Kec. Cilacap Tengah, Kabupaten Cilacap, Jawa Tengah",
+      "dtks_status": "Terdaftar",
+      "evaluasi_layanan": "Memuaskan",
+      "kondisi_kesehatan": [
+        "Tidak Bisa Berdiri/Lumpuh"
+      ],
+      "koordinat": [
+        109.0096,
+        -7.727838
+      ],
+      "nama": "XXXXXXXXX",
+      "nik": "1234567891011121",
+      "riwayat_atensi": [],
+      "status_monitoring": "Aktif",
+      "status_sosial": "Fakir Miskin",
+      "usia": 99
+    },
+    {
+      "alamat": "Jl. KH. Moh. Amin, Koper, Kec. Kresek, Kabupaten Tangerang, Banten 15620",
+      "dtks_status": "Belum Terdaftar",
+      "evaluasi_layanan": "Memuaskan",
+      "kondisi_kesehatan": [
+        "Hipertensi"
+      ],
+      "koordinat": [
+        106.37987,
+        -6.130238
+      ],
+      "nama": "dfgdgdgdfgfg",
+      "nik": "3422222222222222",
+      "riwayat_atensi": [],
+      "status_monitoring": "Aktif",
+      "status_sosial": "Mampu",
+      "usia": 72
+    }
+  ]
+}

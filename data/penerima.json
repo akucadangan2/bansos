@@ -1,0 +1,121 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          106.55037257820368,
+          -6.988240819745665
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Sukatani, Kec. Surade, Kabupaten Sukabumi, Jawa Barat",
+        "durasi": "BULANAN",
+        "geocoding_failed": false,
+        "id": "1751349727315",
+        "is_custom_bantuan": false,
+        "jenis_bantuan": "BPNT",
+        "jumlah_bantuan": 10000,
+        "nama": "Xauusd",
+        "nik": "12121345678899",
+        "status": "Selesai",
+        "tanggal_terima": "2025-07-01"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          113.25077,
+          -7.194952
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Rw. VI, Gn. Sekar, Kec. Sampang, Kabupaten Sampang, Jawa Timur 69216",
+        "durasi": "BULANAN",
+        "geocoding_failed": false,
+        "id": "1753340564193",
+        "is_custom_bantuan": false,
+        "jenis_bantuan": "Bansos Covid-19",
+        "jumlah_bantuan": 1000000,
+        "nama": "Mr XXXXX",
+        "nik": "232400101234200111",
+        "status": "Aktif",
+        "tanggal_terima": "2025-07-24"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          110.66721,
+          -6.591012
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Jl. Centra, Mulyoharjo II, Mulyoharjo, Kec. Jepara, Kabupaten Jepara, Jawa Tengah 59431",
+        "durasi": "BULANAN",
+        "geocoding_failed": false,
+        "id": "1753348635813",
+        "is_custom_bantuan": false,
+        "jenis_bantuan": "BPNT",
+        "jumlah_bantuan": 99999996,
+        "nama": "Mr Data Baru",
+        "nik": "31231231312313131313",
+        "status": "Aktif",
+        "tanggal_terima": "2025-07-22"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          106.79273,
+          -6.588566
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "9QVV+4G6, RT.05/RW.01, Paledang, Kecamatan Bogor Tengah, Kota Bogor, Jawa Barat 16122",
+        "durasi": "BULANAN",
+        "geocoding_failed": false,
+        "id": "1753406031554",
+        "is_custom_bantuan": false,
+        "jenis_bantuan": "PKH",
+        "jumlah_bantuan": 10000000,
+        "nama": "Mr XXXXXXX",
+        "nik": "248239648912649861",
+        "status": "Aktif",
+        "tanggal_terima": "2025-07-25"
+      },
+      "type": "Feature"
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          131.28134,
+          -0.882779
+        ]
+      },
+      "properties": {
+        "id": "1753622339937",
+        "nama": "Rano Karno",
+        "nik": "11111111111111111111111333",
+        "alamat": "47F4+VFQ, Jl. Kuda Laut, Klakublik, Distrik Sorong, Kota Sorong, Papua Bar. 98411",
+        "jenis_bantuan": "PKH",
+        "jumlah_bantuan": 10000,
+        "status": "Aktif",
+        "tanggal_terima": "2025-07-27",
+        "durasi": "Harian",
+        "geocoding_failed": false,
+        "is_custom_bantuan": false
+      }
+    }
+  ],
+  "custom_bantuan": []
+}

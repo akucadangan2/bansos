@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGIS Kemensos - Layanan Lanjut Usia</title>
+    <link rel="icon" type="image/png" href="/static/images/favicon.png">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <script src="/static/js/rbac.js"></script>
+    <script src="/static/js/lansia.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #1a202c;
+            background: #f7fafc;
+        }
+        .btn-primary {
+            background: #2b6cb0;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: #2c5282;
+            transform: translateY(-1px);
+        }
+        .btn-primary:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: #a0aec0;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: #718096;
+            transform: translateY(-1px);
+        }
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+        }
+        .modal {
+            display: none;
+            z-index: 1000;
+            background: rgba(0,0,0,0.7);
+        }
+        .modal-content {
+            max-height: 85vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #2b6cb0 #f7fafc;
+        }
+        #map, #preview-map, #community-map {
+            height: 350px;
+            border-radius: 0.375rem;
+            border: 1px solid #e2e8f0;
+        }
+        .tooltip {
+            background: #e6fffa;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            border: 1px solid #319795;
+            font-size: 0.85rem;
+            color: #1a202c;
+        }
+        .accessibility-mode {
+            font-size: 1.2rem !important;
+            background: #e6fffa !important;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-content {
+            animation: fadeIn 0.3s ease;
+        }
+        .notification {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: #38a169;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 2000;
+            display: none;
+        }
+        .health-table, .needs-table, .activity-table {
+            max-height: 180px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #2b6cb0 #f7fafc;
+        }
+        .table-modern th, .table-modern td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .table-modern th {
+            background: #edf2f7;
+            font-weight: 600;
+            text-align: left;
+        }
+        .table-modern tr:hover {
+            background: #f7fafc;
+        }
+        .program-name {
+            cursor: pointer;
+            color: #2b6cb0;
+            text-decoration: underline;
+        }
+        .program-name:hover {
+            color: #2c5282;
+        }
+        .doc-link {
+            cursor: pointer;
+            color: #2b6cb0;
+            text-decoration: underline;
+            font-size: 0.85rem;
+        }
+        .doc-link:hover {
+            color: #2c5282;
+        }
+        #health-chart {
+            max-height: 180px;
+        }
+        #preview-image {
+            max-width: 100%;
+            max-height: 100px;
+            border-radius: 0.375rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        #dokumentasi-image {
+            max-width: 80vw;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+        }
+        @media (max-width: 640px) {
+            body {
+                font-size: 0.85rem;
+            }
+            #map, #preview-map, #community-map {
+                height: 300px;
+            }
+            .card {
+                padding: 1rem;
+            }
+            .modal-content {
+                max-width: 90vw;
+            }
+            .table-modern th, .table-modern td {
+                padding: 0.5rem;
+            }
+            #preview-image {
+                max-height: 80px;
+            }
+            #dokumentasi-image {
+                max-width: 90vw;
+                max-height: 60vh;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <nav class="bg-white shadow fixed top-0 w-full z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <img src="/static/images/Kemensos.png" alt="Logo Kemensos" class="w-10 h-10 rounded-full">
+                <span class="text-xl font-semibold text-gray-800">Layanan Lanjut Usia</span>
+            </div>
+                </button>
+                <a href="/" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Bantuan Sosial</a>
+                <a href="/fasilitas" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Fasilitas</a>
+                <a href="/layanan" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Layanan</a>
+                <a href="/bencana" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Bencana</a>
+                <a href="/lansia_individu" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Manajemen Lansia</a>
+                <a href="/lansia_komprehensif" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Lansia Komprehensif</a>
+                {% if user_info.is_authenticated and user_info.role == 'admin' %}
+                    <a href="/pengajuan" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">
+                        Review Pengajuan
+                        <span class="notification-bell">
+                            <i class="fas fa-bell"></i>
+                            <span id="pending-count-nav" class="badge bg-red-500 text-white text-xs rounded-full px-2 py-1"></span>
+                        </span>
+                    </a>
+                {% endif %}
+                {% if user_info.is_authenticated %}
+                    <a href="/akun" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Akun</a>
+                    <a href="/logout" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Logout</a>
+                {% else %}
+                    <a href="/auth?tab=login" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Login</a>
+                    <a href="/auth?tab=register" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <div class="container mx-auto mt-20 px-4">
+        <div class="card">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-user-friends"></i> Layanan Lanjut Usia
+            </h2>
+            <div class="flex flex-col lg:flex-row gap-4">
+                <div class="lg:w-2/3">
+                    <div id="map" class="mb-4"></div>
+                    <div class="card">
+                        <h3 class="text-lg font-medium mb-3">Peringatan Jadwal</h3>
+                        <ul id="schedule-alerts" class="text-sm"></ul>
+                    </div>
+                    <div class="card mt-4">
+                        <h3 class="text-lg font-medium mb-3">Komunitas Lansia</h3>
+                        <div id="community-map" class="mb-4"></div>
+                        <div class="activity-table">
+                            <h4 class="text-base font-medium mb-2">Ringkasan Aktivitas Lansia</h4>
+                            <table class="w-full text-sm border-collapse table-modern">
+                                <thead>
+                                    <tr>
+                                        <th class="p-2">Aktivitas</th>
+                                        <th class="p-2">Jumlah Program</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="activity-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:w-1/3">
+                    <div class="card mb-4">
+                        <h3 class="text-lg font-medium mb-3">Filter Layanan</h3>
+                        <select id="filter-jenis" class="w-full p-2 rounded border border-gray-300 text-sm mb-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="">Semua Jenis</option>
+                            <option value="Posyandu Lansia">Posyandu Lansia</option>
+                            <option value="Rehabilitasi Sosial">Rehabilitasi Sosial</option>
+                            <option value="Bantuan Sosial">Bantuan Sosial</option>
+                        </select>
+                        <select id="filter-provinsi" class="w-full p-2 rounded border border-gray-300 text-sm mb-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="">Semua Provinsi</option>
+                        </select>
+                        <button id="toggle-health-heatmap" class="btn-primary text-sm w-full mb-2">Toggle Heatmap Kesehatan</button>
+                        <button id="toggle-heatmap" class="btn-primary text-sm w-full mb-2">Toggle Heatmap Peserta</button>
+                    </div>
+                    <div class="card mb-4">
+                        <h3 class="text-lg font-medium mb-3">Statistik Kesehatan Lansia</h3>
+                        <div class="flex flex-col gap-4">
+                            <div class="health-table">
+                                <table class="w-full text-sm border-collapse table-modern">
+                                    <thead>
+                                        <tr>
+                                            <th class="p-2">Kondisi</th>
+                                            <th class="p-2">Jumlah</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="health-table"></tbody>
+                                </table>
+                            </div>
+                            <div>
+                                <canvas id="health-chart" class="max-h-180"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 class="text-lg font-medium mb-3">Analitik Kebutuhan Khusus</h3>
+                        <div class="needs-table">
+                            <table class="w-full text-sm border-collapse table-modern">
+                                <thead>
+                                    <tr>
+                                        <th class="p-2">Kebutuhan</th>
+                                        <th class="p-2">Jumlah Program</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="needs-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 flex gap-3">
+                <button id="input-btn" class="btn-primary text-sm"><i class="fas fa-plus"></i> Tambah Layanan Lansia</button>
+                <button id="export-csv-btn" class="btn-primary text-sm"><i class="fas fa-download"></i> Export CSV</button>
+                <button id="export-excel-btn" class="btn-primary text-sm"><i class="fas fa-file-excel"></i> Export Excel</button>
+                <button id="export-pdf-btn" class="btn-primary text-sm"><i class="fas fa-file-pdf"></i> Export PDF</button>
+            </div>
+            <div class="mt-4">
+                <table class="w-full text-sm border-collapse table-modern">
+                    <thead>
+                        <tr>
+                            <th class="p-2">Nama Program</th>
+                            <th class="p-2">Jenis</th>
+                            <th class="p-2">Peserta</th>
+                            <th class="p-2">Dokumentasi</th>
+                            <th class="p-2">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lansia-table"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="input-modal" class="modal fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden">
+        <div class="card w-full max-w-2xl p-6 modal-content">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-user-plus"></i> Tambah Layanan Lansia
+            </h3>
+            <form id="input-form" class="space-y-4">
+                <input type="hidden" id="edit-id">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nama Program</label>
+                        <input type="text" id="nama_program" name="nama_program" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Jenis Program</label>
+                        <select id="jenis_program" name="jenis_program" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" required>
+                            <option value="Posyandu Lansia">Posyandu Lansia</option>
+                            <option value="Rehabilitasi Sosial">Rehabilitasi Sosial</option>
+                            <option value="Bantuan Sosial">Bantuan Sosial</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Alamat</label>
+                    <textarea id="alamat" name="alamat" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" rows="3" required></textarea>
+                    <a id="alamat-link" href="#" target="_blank" class="text-blue-600 hover:underline text-xs flex items-center gap-1 mt-1">
+                        <i class="fas fa-map-marker-alt"></i> Lihat di Google Maps
+                    </a>
+                </div>
+                <div id="preview-map" class="w-full h-48 rounded border border-gray-300"></div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Kebutuhan Khusus</label>
+                    <select id="kebutuhan_khusus" name="kebutuhan_khusus" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" multiple>
+                        <option value="Akses kursi roda">Akses kursi roda</option>
+                        <option value="Alat bantu dengar">Alat bantu dengar</option>
+                        <option value="Fisioterapi">Fisioterapi</option>
+                        <option value="Layanan kesehatan mental">Layanan kesehatan mental</option>
+                        <option value="Bantuan pangan">Bantuan pangan</option>
+                        <option value="Transportasi">Transportasi</option>
+                        <option value="Penyakit jantung">Penyakit jantung</option>
+                        <option value="Gangguan penglihatan">Gangguan penglihatan</option>
+                        <option value="Perawatan demensia">Perawatan demensia</option>
+                        <option value="Layanan pendamping">Layanan pendamping</option>
+                        <option value="Akses teknologi ramah lansia">Akses teknologi ramah lansia</option>
+                        <option value="Rehabilitasi kognitif">Rehabilitasi kognitif</option>
+                        <option value="Bantuan hukum">Bantuan hukum</option>
+                        <option value="Konsultasi gizi">Konsultasi gizi</option>
+                        <option value="Aktivitas rekreasi">Aktivitas rekreasi</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">Tahan Ctrl untuk memilih beberapa opsi</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Aktivitas Komunitas</label>
+                    <select id="aktivitas_komunitas" name="aktivitas_komunitas" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" multiple>
+                        <option value="Senam Lansia">Senam Lansia</option>
+                        <option value="Klub Baca">Klub Baca</option>
+                        <option value="Terapi Kelompok">Terapi Kelompok</option>
+                        <option value="Pelatihan Keterampilan">Pelatihan Keterampilan</option>
+                        <option value="Bazaar Lansia">Bazaar Lansia</option>
+                        <option value="Kunjungan Sosial">Kunjungan Sosial</option>
+                        <option value="Kegiatan Keagamaan">Kegiatan Keagamaan</option>
+                        <option value="Wisata Lansia">Wisata Lansia</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">Tahan Ctrl untuk memilih beberapa opsi</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Gambar Dokumentasi</label>
+                    <input type="file" id="dokumentasi" name="dokumentasi" accept="image/jpeg,image/png" class="w-full p-2 rounded border border-gray-300 text-sm">
+                    <img id="preview-image" src="#" alt="Pratinjau Gambar" class="mt-2">
+                    <p class="text-xs text-gray-500 mt-1">Maksimum 1MB, format JPG/PNG</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Jadwal Mulai</label>
+                        <input type="date" id="jadwal_mulai" name="jadwal_mulai" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Jadwal Selesai</label>
+                        <input type="date" id="jadwal_selesai" name="jadwal_selesai" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Jumlah Peserta</label>
+                        <input type="number" id="peserta" name="peserta" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" min="0" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Anggaran (Rp)</label>
+                        <input type="number" id="anggaran" name="anggaran" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" min="0" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Status</label>
+                    <select id="status" name="status" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" required>
+                        <option value="Aktif">Aktif</option>
+                        <option value="Selesai">Selesai</option>
+                        <option value="Direncanakan">Direncanakan</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Rekomendasi Layanan</label>
+                    <select id="rekomendasi_layanan" name="rekomendasi_layanan" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500">
+                        <option value="">Pilih rekomendasi</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" id="cari-koordinat" class="btn-primary text-sm"><i class="fas fa-search-location"></i> Cari Koordinat</button>
+                    <button type="submit" id="simpan-btn" class="btn-primary text-sm"><i class="fas fa-save"></i> Simpan</button>
+                    <button type="button" id="batal-btn" class="btn-secondary text-sm"><i class="fas fa-times"></i> Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="dokumentasi-modal" class="modal fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden">
+        <div class="card w-full max-w-4xl p-6 modal-content">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-image"></i> Dokumentasi Program
+            </h3>
+            <div class="flex justify-center">
+                <img id="dokumentasi-image" src="#" alt="Dokumentasi">
+            </div>
+            <div class="flex justify-end mt-4">
+                <button id="tutup-dokumentasi-btn" class="btn-secondary text-sm"><i class="fas fa-times"></i> Tutup</button>
+            </div>
+        </div>
+    </div>
+    <div id="notification" class="notification"></div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <script>
+        function updatePendingCount() {
+            fetch('/api/pending_submissions')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('pending-count');
+                    const badgeNav = document.getElementById('pending-count-nav');
+                    if (badge && badgeNav) {
+                        badge.textContent = data.count || 0;
+                        badgeNav.textContent = data.count || 0;
+                        badge.style.display = data.count > 0 ? 'inline' : 'none';
+                        badgeNav.style.display = data.count > 0 ? 'inline' : 'none';
+                    }
+                })
+                .catch(error => console.error('Error fetching pending submissions:', error));
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            updatePendingCount();
+            setInterval(updatePendingCount, 30000);
+            document.getElementById('accessibility-btn').addEventListener('click', () => {
+                document.body.classList.toggle('accessibility-mode');
+                localStorage.setItem('accessibilityMode', document.body.classList.contains('accessibility-mode'));
+            });
+            if (localStorage.getItem('accessibilityMode') === 'true') {
+                document.body.classList.add('accessibility-mode');
+            }
+        });
+    </script>
+</body>
+</html>

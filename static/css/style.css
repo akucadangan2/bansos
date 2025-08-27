@@ -1,0 +1,120 @@
+#map {
+    width: 100%;
+    height: 100%;
+}
+#sidebar {
+    z-index: 1000;
+    transition: all 0.3s ease;
+    overflow-x: hidden;
+}
+#sidebar:hover {
+    cursor: col-resize;
+}
+.font-poppins {
+    font-family: 'Poppins', sans-serif;
+}
+canvas {
+    height: 150px !important;
+}
+#input-modal, #grafik-modal, #update-modal {
+    z-index: 2000;
+}
+#input-modal > div, #grafik-modal > div, #update-modal > div {
+    transition: transform 0.3s ease;
+}
+.leaflet-popup-content-wrapper {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.pulse-icon {
+    position: relative;
+    z-index: 100;
+}
+.pulse-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 69, 0, 0.4);
+    border: 2px solid rgba(255, 69, 0, 0.8);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: pulse 2s ease-out infinite;
+}
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.8);
+        opacity: 0;
+    }
+}
+.custom-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+}
+/* Tambahan untuk auth.html */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+.font-poppins {
+    font-family: 'Poppins', sans-serif;
+}
+
+.bg-gray-900 {
+    background-color: #1a202c;
+}
+
+.bg-gray-800 {
+    background-color: #2d3748;
+}
+
+.text-orange-500 {
+    color: #f6ad55;
+}
+
+.text-orange-300 {
+    color: #fbd38d;
+}
+
+.border-orange-500 {
+    border-color: #f6ad55;
+}
+
+.card {
+    border: none;
+    border-radius: 0.75rem;
+}
+
+.form-control, .form-select {
+    background-color: #2d3748 !important;
+    border-color: #f6ad55 !important;
+    color: #ffffff !important;
+}
+
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 0.2rem rgba(246, 173, 85, 0.25);
+}
+
+.table-dark {
+    --bs-table-bg: #2d3748;
+    --bs-table-color: #ffffff;
+}
+
+.table-hover tbody tr:hover {
+    --bs-table-accent-bg: #3a4659;
+}
+
+.btn-orange {
+    background: linear-gradient(to right, #f6ad55, #ed8936);
+    border: none;
+    color: #ffffff;
+}
+
+.btn-orange:hover {
+    background: linear-gradient(to right, #ed8936, #dd6b20);
+}

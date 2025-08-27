@@ -1,0 +1,1121 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.258,
+          -5.425
+        ]
+      },
+      "properties": {
+        "id": "1",
+        "nama_fasilitas": "Panti Asuhan Budi Mulia",
+        "jenis_fasilitas": "Panti Asuhan",
+        "lokasi": {
+          "provinsi": "Lampung",
+          "kab_kota": "Bandar Lampung",
+          "kecamatan": "Telukbetung Utara",
+          "desa": "Kupang Teba"
+        },
+        "alamat": "Kupang Teba, Telukbetung Utara, Bandar Lampung, Lampung",
+        "koordinat": [
+          105.258,
+          -5.425
+        ],
+        "kapasitas": 100,
+        "penghuni": 80,
+        "status": "Aktif",
+        "instansi": "Kemensos",
+        "kontak": "0812-345-6789",
+        "fasilitas": [
+          "Medis",
+          "Konseling"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.8456,
+          -6.2145
+        ]
+      },
+      "properties": {
+        "id": "2",
+        "nama_fasilitas": "Panti Jompo Tresna Werdha",
+        "jenis_fasilitas": "Panti Jompo",
+        "lokasi": {
+          "provinsi": "DKI Jakarta",
+          "kab_kota": "Jakarta Timur",
+          "kecamatan": "Jatinegara",
+          "desa": "Kampung Melayu"
+        },
+        "alamat": "Kampung Melayu, Jatinegara, Jakarta Timur, DKI Jakarta",
+        "koordinat": [
+          106.8456,
+          -6.2145
+        ],
+        "kapasitas": 50,
+        "penghuni": 45,
+        "status": "Aktif",
+        "instansi": "Yayasan",
+        "kontak": "021-12345678",
+        "fasilitas": [
+          "Medis",
+          "Asrama"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.27876891195774,
+          -4.506734681248464
+        ]
+      },
+      "properties": {
+        "id": "3",
+        "nama_fasilitas": "RPTC Sulsel",
+        "jenis_fasilitas": "RPTC",
+        "lokasi": {
+          "provinsi": "Sulawesi Selatan",
+          "kab_kota": "Bone",
+          "kecamatan": "Bontocani",
+          "desa": "Mattiro Walie"
+        },
+        "alamat": "Mattiro Walie, Bontocani, Bone, Sulawesi Selatan",
+        "koordinat": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "kapasitas": 30,
+        "penghuni": 20,
+        "status": "Perlu Perbaikan",
+        "instansi": "Kemensos",
+        "kontak": "0813-456-7890",
+        "fasilitas": [
+          "Konseling",
+          "Shelter"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.27,
+          -5.43
+        ]
+      },
+      "properties": {
+        "id": "4",
+        "nama_fasilitas": "Balai Rehabilitasi Disabilitas",
+        "jenis_fasilitas": "Balai Rehabilitasi",
+        "lokasi": {
+          "provinsi": "Lampung",
+          "kab_kota": "Bandar Lampung",
+          "kecamatan": "Telukbetung Selatan",
+          "desa": "Pesawahan"
+        },
+        "alamat": "Pesawahan, Telukbetung Selatan, Bandar Lampung, Lampung",
+        "koordinat": [
+          105.27,
+          -5.43
+        ],
+        "kapasitas": 60,
+        "penghuni": 55,
+        "status": "Aktif",
+        "instansi": "Kemensos",
+        "kontak": "0812-987-6543",
+        "fasilitas": [
+          "Pelatihan",
+          "Medis"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.85,
+          -6.22
+        ]
+      },
+      "properties": {
+        "id": "5",
+        "nama_fasilitas": "Sentra Kreasi Atensi Jakarta",
+        "jenis_fasilitas": "Sentra Layanan",
+        "lokasi": {
+          "provinsi": "DKI Jakarta",
+          "kab_kota": "Jakarta Timur",
+          "kecamatan": "Jatinegara",
+          "desa": "Cipinang"
+        },
+        "alamat": "Cipinang, Jatinegara, Jakarta Timur, DKI Jakarta",
+        "koordinat": [
+          106.85,
+          -6.22
+        ],
+        "kapasitas": 40,
+        "penghuni": 35,
+        "status": "Aktif",
+        "instansi": "Kemensos",
+        "kontak": "021-87654321",
+        "fasilitas": [
+          "Pelatihan",
+          "Konseling"
+        ]
+      }
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          105.258,
+          -5.425
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Kupang Teba, Telukbetung Utara, Bandar Lampung, Lampung",
+        "fasilitas": [
+          "Medis",
+          "Konseling"
+        ],
+        "id": "1",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "Panti Asuhan",
+        "kapasitas": 100,
+        "kontak": "0812-345-6789",
+        "koordinat": [
+          105.258,
+          -5.425
+        ],
+        "lokasi": {
+          "desa": "Kupang Teba",
+          "kab_kota": "Bandar Lampung",
+          "kecamatan": "Telukbetung Utara",
+          "provinsi": "Lampung"
+        },
+        "nama_fasilitas": "Panti Asuhan Budi Mulia",
+        "penghuni": 80,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          106.8456,
+          -6.2145
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Kampung Melayu, Jatinegara, Jakarta Timur, DKI Jakarta",
+        "fasilitas": [
+          "Medis",
+          "Asrama"
+        ],
+        "id": "2",
+        "instansi": "Yayasan",
+        "jenis_fasilitas": "Panti Jompo",
+        "kapasitas": 50,
+        "kontak": "021-12345678",
+        "koordinat": [
+          106.8456,
+          -6.2145
+        ],
+        "lokasi": {
+          "desa": "Kampung Melayu",
+          "kab_kota": "Jakarta Timur",
+          "kecamatan": "Jatinegara",
+          "provinsi": "DKI Jakarta"
+        },
+        "nama_fasilitas": "Panti Jompo Tresna Werdha",
+        "penghuni": 45,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Mattiro Walie, Bontocani, Bone, Sulawesi Selatan",
+        "fasilitas": [
+          "Konseling",
+          "Shelter"
+        ],
+        "id": "3",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "RPTC",
+        "kapasitas": 30,
+        "kontak": "0813-456-7890",
+        "koordinat": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "lokasi": {
+          "desa": "Mattiro Walie",
+          "kab_kota": "Bone",
+          "kecamatan": "Bontocani",
+          "provinsi": "Sulawesi Selatan"
+        },
+        "nama_fasilitas": "RPTC Sulsel",
+        "penghuni": 20,
+        "status": "Perlu Perbaikan"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          105.27,
+          -5.43
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Pesawahan, Telukbetung Selatan, Bandar Lampung, Lampung",
+        "fasilitas": [
+          "Pelatihan",
+          "Medis"
+        ],
+        "id": "4",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "Balai Rehabilitasi",
+        "kapasitas": 60,
+        "kontak": "0812-987-6543",
+        "koordinat": [
+          105.27,
+          -5.43
+        ],
+        "lokasi": {
+          "desa": "Pesawahan",
+          "kab_kota": "Bandar Lampung",
+          "kecamatan": "Telukbetung Selatan",
+          "provinsi": "Lampung"
+        },
+        "nama_fasilitas": "Balai Rehabilitasi Disabilitas",
+        "penghuni": 55,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          106.85,
+          -6.22
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Cipinang, Jatinegara, Jakarta Timur, DKI Jakarta",
+        "fasilitas": [
+          "Pelatihan",
+          "Konseling"
+        ],
+        "id": "5",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "Sentra Layanan",
+        "kapasitas": 40,
+        "kontak": "021-87654321",
+        "koordinat": [
+          106.85,
+          -6.22
+        ],
+        "lokasi": {
+          "desa": "Cipinang",
+          "kab_kota": "Jakarta Timur",
+          "kecamatan": "Jatinegara",
+          "provinsi": "DKI Jakarta"
+        },
+        "nama_fasilitas": "Sentra Kreasi Atensi Jakarta",
+        "penghuni": 35,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Mattiro Walie, Bontocani, Bone, Sulawesi Selatan",
+        "fasilitas": [
+          "Konseling",
+          "Shelter"
+        ],
+        "id": "3",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "RPTC",
+        "kapasitas": 30,
+        "kontak": "0813-456-7890",
+        "koordinat": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "lokasi": {
+          "desa": "Mattiro Walie",
+          "kab_kota": "Bone",
+          "kecamatan": "Bontocani",
+          "provinsi": "Sulawesi Selatan"
+        },
+        "nama_fasilitas": "RPTC Sulsel",
+        "penghuni": 20,
+        "status": "Perlu Perbaikan"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          105.27,
+          -5.43
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Pesawahan, Telukbetung Selatan, Bandar Lampung, Lampung",
+        "fasilitas": [
+          "Pelatihan",
+          "Medis"
+        ],
+        "id": "4",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "Balai Rehabilitasi",
+        "kapasitas": 60,
+        "kontak": "0812-987-6543",
+        "koordinat": [
+          105.27,
+          -5.43
+        ],
+        "lokasi": {
+          "desa": "Pesawahan",
+          "kab_kota": "Bandar Lampung",
+          "kecamatan": "Telukbetung Selatan",
+          "provinsi": "Lampung"
+        },
+        "nama_fasilitas": "Balai Rehabilitasi Disabilitas",
+        "penghuni": 55,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Mattiro Walie, Bontocani, Bone, Sulawesi Selatan",
+        "fasilitas": [
+          "Konseling",
+          "Shelter"
+        ],
+        "id": "3",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "RPTC",
+        "kapasitas": 30,
+        "kontak": "0813-456-7890",
+        "koordinat": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "lokasi": {
+          "desa": "Mattiro Walie",
+          "kab_kota": "Bone",
+          "kecamatan": "Bontocani",
+          "provinsi": "Sulawesi Selatan"
+        },
+        "nama_fasilitas": "RPTC Sulsel",
+        "penghuni": 20,
+        "status": "Perlu Perbaikan"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          105.27,
+          -5.43
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Pesawahan, Telukbetung Selatan, Bandar Lampung, Lampung",
+        "fasilitas": [
+          "Pelatihan",
+          "Medis"
+        ],
+        "id": "4",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "Balai Rehabilitasi",
+        "kapasitas": 60,
+        "kontak": "0812-987-6543",
+        "koordinat": [
+          105.27,
+          -5.43
+        ],
+        "lokasi": {
+          "desa": "Pesawahan",
+          "kab_kota": "Bandar Lampung",
+          "kecamatan": "Telukbetung Selatan",
+          "provinsi": "Lampung"
+        },
+        "nama_fasilitas": "Balai Rehabilitasi Disabilitas",
+        "penghuni": 55,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Mattiro Walie, Bontocani, Bone, Sulawesi Selatan",
+        "fasilitas": [
+          "Konseling",
+          "Shelter"
+        ],
+        "id": "3",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "RPTC",
+        "kapasitas": 30,
+        "kontak": "0813-456-7890",
+        "koordinat": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "lokasi": {
+          "desa": "Mattiro Walie",
+          "kab_kota": "Bone",
+          "kecamatan": "Bontocani",
+          "provinsi": "Sulawesi Selatan"
+        },
+        "nama_fasilitas": "RPTC Sulsel",
+        "penghuni": 20,
+        "status": "Perlu Perbaikan"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          105.27,
+          -5.43
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Pesawahan, Telukbetung Selatan, Bandar Lampung, Lampung",
+        "fasilitas": [
+          "Pelatihan",
+          "Medis"
+        ],
+        "id": "4",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "Balai Rehabilitasi",
+        "kapasitas": 60,
+        "kontak": "0812-987-6543",
+        "koordinat": [
+          105.27,
+          -5.43
+        ],
+        "lokasi": {
+          "desa": "Pesawahan",
+          "kab_kota": "Bandar Lampung",
+          "kecamatan": "Telukbetung Selatan",
+          "provinsi": "Lampung"
+        },
+        "nama_fasilitas": "Balai Rehabilitasi Disabilitas",
+        "penghuni": 55,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Mattiro Walie, Bontocani, Bone, Sulawesi Selatan",
+        "fasilitas": [
+          "Konseling",
+          "Shelter"
+        ],
+        "id": "3",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "RPTC",
+        "kapasitas": 30,
+        "kontak": "0813-456-7890",
+        "koordinat": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "lokasi": {
+          "desa": "Mattiro Walie",
+          "kab_kota": "Bone",
+          "kecamatan": "Bontocani",
+          "provinsi": "Sulawesi Selatan"
+        },
+        "nama_fasilitas": "RPTC Sulsel",
+        "penghuni": 20,
+        "status": "Perlu Perbaikan"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          105.27,
+          -5.43
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Pesawahan, Telukbetung Selatan, Bandar Lampung, Lampung",
+        "fasilitas": [
+          "Pelatihan",
+          "Medis"
+        ],
+        "id": "4",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "Balai Rehabilitasi",
+        "kapasitas": 60,
+        "kontak": "0812-987-6543",
+        "koordinat": [
+          105.27,
+          -5.43
+        ],
+        "lokasi": {
+          "desa": "Pesawahan",
+          "kab_kota": "Bandar Lampung",
+          "kecamatan": "Telukbetung Selatan",
+          "provinsi": "Lampung"
+        },
+        "nama_fasilitas": "Balai Rehabilitasi Disabilitas",
+        "penghuni": 55,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Mattiro Walie, Bontocani, Bone, Sulawesi Selatan",
+        "fasilitas": [
+          "Konseling",
+          "Shelter"
+        ],
+        "id": "3",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "RPTC",
+        "kapasitas": 30,
+        "kontak": "0813-456-7890",
+        "koordinat": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "lokasi": {
+          "desa": "Mattiro Walie",
+          "kab_kota": "Bone",
+          "kecamatan": "Bontocani",
+          "provinsi": "Sulawesi Selatan"
+        },
+        "nama_fasilitas": "RPTC Sulsel",
+        "penghuni": 20,
+        "status": "Perlu Perbaikan"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          105.27,
+          -5.43
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Pesawahan, Telukbetung Selatan, Bandar Lampung, Lampung",
+        "fasilitas": [
+          "Pelatihan",
+          "Medis"
+        ],
+        "id": "4",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "Balai Rehabilitasi",
+        "kapasitas": 60,
+        "kontak": "0812-987-6543",
+        "koordinat": [
+          105.27,
+          -5.43
+        ],
+        "lokasi": {
+          "desa": "Pesawahan",
+          "kab_kota": "Bandar Lampung",
+          "kecamatan": "Telukbetung Selatan",
+          "provinsi": "Lampung"
+        },
+        "nama_fasilitas": "Balai Rehabilitasi Disabilitas",
+        "penghuni": 55,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Mattiro Walie, Bontocani, Bone, Sulawesi Selatan",
+        "fasilitas": [
+          "Konseling",
+          "Shelter"
+        ],
+        "id": "3",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "RPTC",
+        "kapasitas": 30,
+        "kontak": "0813-456-7890",
+        "koordinat": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "lokasi": {
+          "desa": "Mattiro Walie",
+          "kab_kota": "Bone",
+          "kecamatan": "Bontocani",
+          "provinsi": "Sulawesi Selatan"
+        },
+        "nama_fasilitas": "RPTC Sulsel",
+        "penghuni": 20,
+        "status": "Perlu Perbaikan"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          105.27,
+          -5.43
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Pesawahan, Telukbetung Selatan, Bandar Lampung, Lampung",
+        "fasilitas": [
+          "Pelatihan",
+          "Medis"
+        ],
+        "id": "4",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "Balai Rehabilitasi",
+        "kapasitas": 60,
+        "kontak": "0812-987-6543",
+        "koordinat": [
+          105.27,
+          -5.43
+        ],
+        "lokasi": {
+          "desa": "Pesawahan",
+          "kab_kota": "Bandar Lampung",
+          "kecamatan": "Telukbetung Selatan",
+          "provinsi": "Lampung"
+        },
+        "nama_fasilitas": "Balai Rehabilitasi Disabilitas",
+        "penghuni": 55,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "fasilitas": [
+          "Konseling",
+          "Shelter"
+        ],
+        "id": "3",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "RPTC",
+        "kapasitas": 30,
+        "kontak": "0813-456-7890",
+        "koordinat": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "lokasi": {
+          "desa": "Mattiro Walie",
+          "kab_kota": "Bone",
+          "kecamatan": "Bontocani",
+          "provinsi": "Sulawesi Selatan"
+        },
+        "nama_fasilitas": "RPTC Sulsel",
+        "penghuni": 20,
+        "status": "Perlu Perbaikan"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          105.27,
+          -5.43
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "fasilitas": [
+          "Pelatihan",
+          "Medis"
+        ],
+        "id": "4",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "Balai Rehabilitasi",
+        "kapasitas": 60,
+        "kontak": "0812-987-6543",
+        "koordinat": [
+          105.27,
+          -5.43
+        ],
+        "lokasi": {
+          "desa": "Pesawahan",
+          "kab_kota": "Bandar Lampung",
+          "kecamatan": "Telukbetung Selatan",
+          "provinsi": "Lampung"
+        },
+        "nama_fasilitas": "Balai Rehabilitasi Disabilitas",
+        "penghuni": 55,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "fasilitas": [
+          "Konseling",
+          "Shelter"
+        ],
+        "id": "3",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "RPTC",
+        "kapasitas": 30,
+        "kontak": "0813-456-7890",
+        "koordinat": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "lokasi": {
+          "desa": "Mattiro Walie",
+          "kab_kota": "Bone",
+          "kecamatan": "Bontocani",
+          "provinsi": "Sulawesi Selatan"
+        },
+        "nama_fasilitas": "RPTC Sulsel",
+        "penghuni": 20,
+        "status": "Perlu Perbaikan"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          105.27,
+          -5.43
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "fasilitas": [
+          "Pelatihan",
+          "Medis"
+        ],
+        "id": "4",
+        "instansi": "Kemensos",
+        "jenis_fasilitas": "Balai Rehabilitasi",
+        "kapasitas": 60,
+        "kontak": "0812-987-6543",
+        "koordinat": [
+          105.27,
+          -5.43
+        ],
+        "lokasi": {
+          "desa": "Pesawahan",
+          "kab_kota": "Bandar Lampung",
+          "kecamatan": "Telukbetung Selatan",
+          "provinsi": "Lampung"
+        },
+        "nama_fasilitas": "Balai Rehabilitasi Disabilitas",
+        "penghuni": 55,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          106.7944210767746,
+          -6.286897583166607
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "fasilitas": [
+          "Medis",
+          "Konseling"
+        ],
+        "id": "654f5cef-75a2-4b38-be65-e4413bb1d03d",
+        "instansi": "Kementrian Sosial DKI",
+        "jenis_fasilitas": "Balai Rehabilitasi",
+        "kapasitas": 222,
+        "kontak": "08121167000",
+        "koordinat": [
+          106.7944210767746,
+          -6.286897583166607
+        ],
+        "lokasi": {
+          "desa": "REHABILITASI CBA 5",
+          "kab_kota": "Jakarta Timur",
+          "kecamatan": "Jatinegara",
+          "nama": "REHABILITASI CBA 5",
+          "provinsi": "DKI Jakarta"
+        },
+        "nama_fasilitas": "REHABILITASI CBA 5",
+        "penghuni": 123,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          112.7735424041748,
+          -7.28109044401125
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "fasilitas": [
+          "Medis",
+          "Konseling"
+        ],
+        "id": "290a0bff-0fcd-4031-a2e5-32146f417820",
+        "instansi": "Kementrian Sosial Surabaya",
+        "jenis_fasilitas": "Panti Jompo",
+        "kapasitas": 66,
+        "kontak": "0812116709",
+        "koordinat": [
+          112.7735424041748,
+          -7.28109044401125
+        ],
+        "lokasi": {
+          "desa": "Panti Jompo 32",
+          "kab_kota": "Bandar Lampung",
+          "kecamatan": "Telukbetung Utara",
+          "nama": "Panti Jompo 32",
+          "provinsi": "Lampung"
+        },
+        "nama_fasilitas": "Panti Jompo 32",
+        "penghuni": 7,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          110.26842392413516,
+          -7.967210501633582
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Tegalrejo, Nayan, Srigading, Kec. Sanden, Kabupaten Bantul, Daerah Istimewa Yogyakarta 55763",
+        "fasilitas": [
+          "Medis",
+          "Konseling"
+        ],
+        "id": "00b43d3b-1378-427d-b15a-ed5a376124d4",
+        "instansi": "Kementrian Sosial Surabaya",
+        "jenis_fasilitas": "Panti Asuhan",
+        "kapasitas": 66,
+        "kontak": "0812116709",
+        "koordinat": [
+          110.26842392413516,
+          -7.967210501633582
+        ],
+        "lokasi": {
+          "desa": "Tegalrejo",
+          "kab_kota": "Srigading",
+          "kecamatan": "Nayan",
+          "provinsi": "Kec. Sanden"
+        },
+        "nama_fasilitas": "Panti Jompo 36",
+        "penghuni": 7,
+        "status": "Perlu Perbaikan"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          107.61776302009821,
+          -3.198272813987735
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Padang Kandis, Membalong, Kabupaten Belitung, Kepulauan Bangka Belitung 33452",
+        "fasilitas": [
+          "Medis",
+          "Konseling"
+        ],
+        "id": "206693c1-65e5-44c1-bdec-66c14903714d",
+        "instansi": "Kementrian Sosial DKI1",
+        "jenis_fasilitas": "RPTC",
+        "kapasitas": 3,
+        "kontak": "08121167001",
+        "koordinat": [
+          107.61776302009821,
+          -3.198272813987735
+        ],
+        "lokasi": {
+          "desa": "Padang Kandis",
+          "kab_kota": "upaten Belitung",
+          "kecamatan": "Membalong",
+          "provinsi": "Kepulauan Bangka Belitung 33452"
+        },
+        "nama_fasilitas": "AIA",
+        "penghuni": 1,
+        "status": "Perlu Perbaikan"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          108.48659992218018,
+          -6.711742595705571
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Bodesari, Kec. Plumbon, Kabupaten Cirebon, Jawa Barat 45155",
+        "fasilitas": [
+          "Medis",
+          "Konseling"
+        ],
+        "id": "ae6f781d-dd52-40a3-8271-66b41412f6f0",
+        "instansi": "Kementrian Sosial Cirebon",
+        "jenis_fasilitas": "Panti Asuhan",
+        "kapasitas": 111,
+        "kontak": "0822782227211",
+        "koordinat": [
+          108.48659992218018,
+          -6.711742595705571
+        ],
+        "lokasi": {
+          "desa": "Bodesari",
+          "kab_kota": "upaten Cirebon",
+          "kecamatan": "Plumbon",
+          "provinsi": "Jawa Barat 45155"
+        },
+        "nama_fasilitas": "PANTI ASUHAN212",
+        "penghuni": 22,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          113.25077,
+          -7.194952
+        ]
+      },
+      "properties": {
+        "id": "b8d9fc5b-d42d-4154-8f97-a4216b15fa21",
+        "nama_fasilitas": "xxx1",
+        "jenis_fasilitas": "RPTC",
+        "alamat": "Rw. VI, Gn. Sekar, Kec. Sampang, Kabupaten Sampang, Jawa Timur 69216",
+        "kontak": "08111111111",
+        "kapasitas": 1111,
+        "penghuni": 111111,
+        "status": "Aktif",
+        "instansi": "Kementrian Sosial Surabaya",
+        "fasilitas": [
+          "Medis",
+          "Konseling"
+        ],
+        "lokasi": {
+          "provinsi": "Kabupaten Sampang",
+          "kab_kota": "Kec. Sampang",
+          "kecamatan": "Gn. Sekar",
+          "desa": "Rw. VI"
+        },
+        "koordinat": [
+          113.25077,
+          -7.194952
+        ]
+      }
+    }
+  ]
+}

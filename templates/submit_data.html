@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengajuan Data - WebGIS Bansos</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white font-poppins">
+    <div class="container mx-auto p-6">
+        <div class="flex justify-center mb-6">
+            <img src="/static/images/Kemensos.png" alt="Kemensos Logo" class="h-16">
+        </div>
+        <h2 class="text-3xl font-semibold text-orange-500 mb-6 text-center">Pengajuan Data</h2>
+        <form id="submit-data-form" class="bg-gray-800 p-8 rounded-xl shadow-2xl max-w-lg mx-auto">
+            <div class="mb-5">
+                <label class="block text-orange-300 text-sm font-medium mb-2">Jenis Data</label>
+                <select id="feature_type" name="feature_type" class="w-full p-3 rounded-lg bg-gray-700 border border-orange-500 text-white text-sm focus:ring-2 focus:ring-orange-400 transition" required>
+                    <option value="bencana">Bencana</option>
+                    <option value="fasilitas">Fasilitas</option>
+                    <option value="layanan">Layanan</option>
+                    <option value="penerima">Penerima</option>
+                </select>
+            </div>
+            <div class="mb-5">
+                <label class="block text-orange-300 text-sm font-medium mb-2">Nama/Jenis (sesuai jenis data)</label>
+                <input type="text" id="nama" name="nama" class="w-full p-3 rounded-lg bg-gray-700 border border-orange-500 text-white text-sm focus:ring-2 focus:ring-orange-400 transition" placeholder="Masukkan nama atau jenis" required>
+            </div>
+            <div class="mb-5">
+                <label class="block text-orange-300 text-sm font-medium mb-2">Alamat</label>
+                <input type="text" id="alamat" name="alamat" class="w-full p-3 rounded-lg bg-gray-700 border border-orange-500 text-white text-sm focus:ring-2 focus:ring-orange-400 transition" placeholder="Masukkan alamat" required>
+            </div>
+            <div class="mb-6">
+                <label class="block text-orange-300 text-sm font-medium mb-2">Waktu (opsional untuk Bencana)</label>
+                <input type="datetime-local" id="waktu_kejadian" name="waktu_kejadian" class="w-full p-3 rounded-lg bg-gray-700 border border-orange-500 text-white text-sm focus:ring-2 focus:ring-orange-400 transition" placeholder="Pilih waktu kejadian">
+            </div>
+            <button type="submit" class="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white p-3 rounded-lg text-sm font-semibold transition-all duration-300">Ajukan Data</button>
+        </form>
+        <a href="{{ url_for('index') }}" class="block text-center text-orange-300 hover:text-orange-400 text-sm mt-6 transition">Kembali ke Beranda</a>
+    </div>
+    <script>
+        document.getElementById('submit-data-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const feature_type = document.getElementById('feature_type').value;
+            const data = {
+                type: 'Feature',
+                geometry: { type: 'Point', coordinates: [0, 0] }, // Koordinat sementara
+                properties: {
+                    id: Date.now().toString(),
+                    nama: document.getElementById('nama').value,
+                    alamat: document.getElementById('alamat').value,
+                    waktu_kejadian: document.getElementById('waktu_kejadian').value || null
+                }
+            };
+            try {
+                const response = await fetch('/api/submissions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ feature_type, data })
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Gagal mengajukan data');
+                alert('Data berhasil diajukan untuk ditinjau!');
+                document.getElementById('submit-data-form').reset();
+            } catch (error) {
+                console.error('Error submitting data:', error);
+                alert('Gagal mengajukan data: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

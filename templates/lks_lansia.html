@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengelolaan LKS Lansia - WebGIS</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.3.2/css/fixedHeader.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/scroller/2.0.7/css/scroller.dataTables.min.css">
+    <link rel="icon" type="image/png" href="/static/images/favicon.png">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/fixedheader/3.3.2/js/dataTables.fixedHeader.min.js"></script>
+    <script src="https://cdn.datatables.net/scroller/2.0.7/js/dataTables.scroller.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/dist/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(180deg, #e6f0fa 0%, #ffffff 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        .tab-btn {
+            background: #ffffff;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 12px 24px;
+            margin: 0 8px 12px 0;
+            color: #1f2937;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .tab-btn:hover {
+            background: #f3f4f6;
+            transform: scale(1.05);
+        }
+        .tab-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+        .action-btn {
+            background: #ffffff;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 12px 24px;
+            color: #1f2937;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .action-btn:hover {
+            background: #f3f4f6;
+            transform: scale(1.05);
+        }
+        .action-btn.primary {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+        }
+        .action-btn.bg-red-500 {
+            background: #ef4444;
+            color: #ffffff;
+            border-color: #ef4444;
+        }
+        .action-btn.bg-yellow-500 {
+            background: #f59e0b;
+            color: #ffffff;
+            border-color: #f59e0b;
+        }
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px; /* Menggantikan space-x-4 dan menambahkan jarak vertikal */
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+        }
+        #map {
+            height: 400px;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        @media (max-width: 640px) {
+            #map { height: 300px; }
+            .action-btn { width: 100%; } /* Tombol full-width di layar kecil */
+        }
+        table {
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            text-align: left;
+        }
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #1f2937;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .modal {
+            background: rgba(0, 0, 0, 0.6);
+            transition: opacity 0.3s ease;
+            z-index: 2000;
+        }
+        .modal-content {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            padding: 24px;
+        }
+        .notification {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 1000;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 12px 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        input, select, textarea {
+            border-radius: 12px;
+            border: 1px solid #d1d5db;
+            padding: 12px;
+            background: #f9fafb;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+        .autocomplete-items {
+            position: absolute;
+            z-index: 1000;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            max-height: 240px;
+            overflow-y: auto;
+            width: 100%;
+        }
+        .autocomplete-items div {
+            padding: 12px;
+            cursor: pointer;
+        }
+        .autocomplete-items div:hover {
+            background: #f3f4f6;
+        }
+        #loading-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        #loading-indicator i {
+            animation: spin 1s linear infinite;
+        }
+        #progress-bar {
+            width: 200px; /* Lebar progress bar diperbesar untuk visibilitas */
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        #progress-fill {
+            height: 100%;
+            background: #2563eb;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .filter-section {
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .lazy-load-placeholder {
+            background: #f9fafb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        .bg-red-100 { background-color: #fee2e2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-4xl font-bold mb-8 text-center text-gray-900">Pengelolaan LKS Lansia</h1>
+
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap mb-8">
+            <button class="tab-btn px-4 py-2 active" data-tab="dashboard">Dashboard</button>
+            <button class="tab-btn px-4 py-2" data-tab="lks">Data LKS</button>
+            <button class="tab-btn px-4 py-2" data-tab="input-data">Input Data</button>
+            <button class="tab-btn px-4 py-2" data-tab="charts">Grafik</button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons mb-8">
+            <button id="input-btn" class="action-btn primary"><i class="fas fa-plus mr-2"></i> Input Data</button>
+            <button id="export-btn" class="action-btn"><i class="fas fa-file-export mr-2"></i> Ekspor</button>
+            <button id="upload-excel-btn" class="action-btn"><i class="fas fa-upload mr-2"></i> Unggah Excel</button>
+            <button id="clear-uploaded-data-btn" class="action-btn bg-red-500 text-white"><i class="fas fa-trash mr-2"></i> Hapus Data Upload</button>
+            <button id="clear-duplicate-data-btn" class="action-btn bg-red-500 text-white"><i class="fas fa-trash mr-2"></i> Hapus Data Duplikat</button>
+            <button id="management-lansia-btn" class="action-btn"><i class="fas fa-users mr-2"></i> Management Lansia</button>
+            <button id="lansia-50-btn" class="action-btn"><i class="fas fa-chart-line mr-2"></i> Lansia 5.0</button>
+            <button id="layanan-lansia-btn" class="action-btn"><i class="fas fa-hands-helping mr-2"></i> Layanan Lansia</button>
+            <button id="help-btn" class="action-btn"><i class="fas fa-question-circle mr-2"></i> Bantuan</button>
+        </div>
+
+        <!-- Loading Indicator with Progress Bar -->
+        <div id="loading-indicator" class="hidden flex items-center">
+            <i class="fas fa-spinner fa-2x text-blue-600"></i>
+            <span class="ml-2 text-gray-800">Memproses...</span>
+            <div id="progress-bar"><div id="progress-fill"></div></div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard-tab" class="tab-content card">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Dashboard LKS Lansia</h2>
+            <div class="flex flex-col md:flex-row space-y-8 md:space-y-0 md:space-x-8 mb-8">
+                <div class="w-full md:w-1/2">
+                    <div id="map" class="lazy-load-placeholder" data-loaded="false">Memuat Peta...</div>
+                </div>
+                <div class="w-full md:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="card">
+                        <h3 class="font-semibold text-gray-800">Total LKS Lansia</h3>
+                        <p id="total-lks" class="text-2xl text-blue-600">0</p>
+                    </div>
+                    <div class="card">
+                        <h3 class="font-semibold text-gray-800">LKS Terakreditasi A</h3>
+                        <p id="lks-a" class="text-2xl text-blue-600">0</p>
+                    </div>
+                    <div class="card">
+                        <h3 class="font-semibold text-gray-800">LKS Dalam Panti</h3>
+                        <p id="lks-dalam-panti" class="text-2xl text-blue-600">0</p>
+                    </div>
+                    <div class="card">
+                        <h3 class="font-semibold text-gray-800">LKS Luar Panti</h3>
+                        <p id="lks-luar-panti" class="text-2xl text-blue-600">0</p>
+                    </div>
+                    <div class="card">
+                        <h3 class="font-semibold text-gray-800">Total Pengajuan Akreditasi</h3>
+                        <p id="total-pengajuan" class="text-2xl text-blue-600">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LKS Lansia Table Tab -->
+        <div id="lks-tab" class="tab-content card hidden">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Daftar LKS Lansia</h2>
+            <div class="filter-section">
+                <label for="filter-provinsi" class="text-gray-700 font-medium mr-2">Filter Provinsi:</label>
+                <select id="filter-provinsi" class="border rounded p-2">
+                    <option value="Semua Provinsi">Semua Provinsi</option>
+                </select>
+                <label for="filter-kabupaten" class="text-gray-700 font-medium mr-2">Filter Kabupaten/Kota:</label>
+                <select id="filter-kabupaten" class="border rounded p-2">
+                    <option value="Semua Kabupaten">Semua Kabupaten</option>
+                </select>
+                <label for="filter-peringkat" class="text-gray-700 font-medium mr-2">Filter Peringkat:</label>
+                <select id="filter-peringkat" class="border rounded p-2">
+                    <option value="">Semua Peringkat</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="TTA">TTA</option>
+                </select>
+                <label for="filter-tahun" class="text-gray-700 font-medium mr-2">Filter Tahun Pengajuan:</label>
+                <select id="filter-tahun" class="border rounded p-2">
+                    <option value="Semua Tahun">Semua Tahun</option>
+                </select>
+                <label for="filter-status" class="text-gray-700 font-medium mr-2">Filter Status:</label>
+                <select id="filter-status" class="border rounded p-2">
+                    <option value="all">Semua Data</option>
+                    <option value="duplicate">Duplikat</option>
+                    <option value="uploaded">Data Upload</option>
+                    <option value="latest">Upload Terbaru</option>
+                    <option value="dummy">Data Dummy</option>
+                </select>
+                <div id="autocomplete-items-filter-provinsi" class="autocomplete-items hidden"></div>
+            </div>
+            <table id="lks-table" class="w-full border-collapse display">
+                <thead>
+                    <tr>
+                        <th class="text-left">No</th>
+                        <th class="text-left">ID Lembaga</th>
+                        <th class="text-left">No Lembaga</th>
+                        <th class="text-left">Nama Lembaga</th>
+                        <th class="text-left">Nama Ketua</th>
+                        <th class="text-left">Alamat</th>
+                        <th class="text-left">Provinsi</th>
+                        <th class="text-left">Kabupaten/Kota</th>
+                        <th class="text-left">Peringkat</th>
+                        <th class="text-left">Jenis Layanan</th>
+                        <th class="text-left">Tahun Pengajuan</th>
+                        <th class="text-left">Status</th>
+                        <th class="text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="mt-4 flex items-center space-x-4">
+                <label for="rows-per-page" class="text-gray-700 font-medium mr-2">Tampilkan:</label>
+                <select id="rows-per-page" class="border rounded p-2">
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="all">Semua</option>
+                </select>
+                <span id="total-displayed" class="text-gray-600">Total Data: 0</span>
+            </div>
+        </div>
+
+        <!-- Input Data Tab -->
+        <div id="input-data-tab" class="tab-content card hidden">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Input Data LKS Lansia</h2>
+            <form id="lks-form" class="space-y-6">
+                <input type="hidden" id="edit-id-lembaga">
+                <!-- Identitas Lembaga -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">ID Lembaga</label>
+                        <input type="text" id="id_lembaga" class="w-full" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">No Lembaga</label>
+                        <input type="text" id="no_lembaga" class="w-full" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Nama Lembaga</label>
+                        <input type="text" id="nama_lembaga" class="w-full" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Nama Ketua</label>
+                        <input type="text" id="nama_ketua" class="w-full" required>
+                    </div>
+                </div>
+
+                <!-- Lokasi -->
+                <div class="border-t pt-4">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Lokasi</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="relative">
+                            <label class="block text-gray-700 font-medium mb-2">Alamat Lembaga (Opsional)</label>
+                            <input type="text" id="alamat_lembaga" class="w-full" placeholder="Masukkan alamat (opsional)">
+                            <div id="autocomplete-items-lembaga" class="autocomplete-items hidden"></div>
+                            <button type="button" id="cari-koordinat-lembaga" class="action-btn mt-3"><i class="fas fa-map-marker-alt mr-2"></i> Cari Koordinat</button>
+                        </div>
+                        <div class="relative">
+                            <label class="block text-gray-700 font-medium mb-2">Provinsi</label>
+                            <input type="text" id="provinsi" class="w-full" required>
+                            <div id="autocomplete-items-provinsi" class="autocomplete-items hidden"></div>
+                        </div>
+                        <div class="relative">
+                            <label class="block text-gray-700 font-medium mb-2">Kabupaten/Kota</label>
+                            <input type="text" id="kabupaten" class="w-full" required>
+                            <div id="autocomplete-items-kabupaten" class="autocomplete-items hidden"></div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">ID Provinsi</label>
+                            <input type="text" id="id_provinsi" class="w-full" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">ID Kabupaten</label>
+                            <input type="text" id="id_kabupaten" class="w-full" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">ID Kecamatan</label>
+                            <input type="text" id="id_kecamatan" class="w-full" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">ID Kelurahan</label>
+                            <input type="text" id="id_kelurahan" class="w-full" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Akreditasi dan Layanan -->
+                <div class="border-t pt-4">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Akreditasi dan Layanan</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">ID Akreditasi</label>
+                            <input type="text" id="id_akreditasi" class="w-full" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Nama Lembaga Akreditasi</label>
+                            <input type="text" id="nama_lembaga_akreditasi" class="w-full" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Peringkat</label>
+                            <select id="peringkat" class="w-full" required>
+                                <option value="">Pilih Peringkat</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="TTA">TTA</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Nama Layanan</label>
+                            <input type="text" id="nama_layanan" class="w-full" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Cluster</label>
+                            <input type="text" id="cluster" class="w-full" list="cluster-options" required>
+                            <datalist id="cluster-options">
+                                <option value="Cluster Lanjut Usia">
+                                <option value="Cluster 1">
+                                <option value="Cluster 2">
+                                <option value="Cluster 3">
+                            </datalist>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Jenis Layanan</label>
+                            <select id="jenis_layanan" class="w-full" required>
+                                <option value="">Pilih Jenis Layanan</option>
+                                <option value="LKS LANJUT USIA DALAM PANTI">Dalam Panti</option>
+                                <option value="LKS LANJUT USIA LUAR PANTI">Luar Panti</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tahun Pengajuan -->
+                <div class="border-t pt-4">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Pengajuan</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Tahun Pengajuan</label>
+                            <input type="number" id="tahun_pengajuan" class="w-full" min="2019" max="2025">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex space-x-4">
+                    <button type="submit" id="simpan-lks-btn" class="action-btn primary"><i class="fas fa-save mr-2"></i> Simpan</button>
+                    <button type="button" id="cancel-lks-edit-btn" class="action-btn hidden"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </form>
+            <!-- Unggah Excel -->
+            <div class="border-t pt-4">
+                <h3 class="text-xl font-semibold mb-4 text-gray-800">Unggah Data Excel</h3>
+                <div class="grid grid-cols-1 gap-4">
+                    <button type="button" id="upload-excel-btn" class="action-btn primary"><i class="fas fa-upload mr-2"></i> Unggah Excel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Tab -->
+        <div id="charts-tab" class="tab-content card hidden">
+            <h2 class="text-2xl font-semibold mb-6 text-gray-800">Grafik LKS Lansia</h2>
+            <div class="filter-section">
+                <label for="chart-provinsi" class="text-gray-700 font-medium mr-2">Filter Provinsi:</label>
+                <select id="chart-provinsi" class="border rounded p-2">
+                    <option value="Semua Provinsi">Semua Provinsi</option>
+                </select>
+                <label for="chart-kabupaten" class="text-gray-700 font-medium mr-2">Filter Kabupaten/Kota:</label>
+                <select id="chart-kabupaten" class="border rounded p-2">
+                    <option value="Semua Kabupaten">Semua Kabupaten</option>
+                </select>
+                <label for="chart-peringkat" class="text-gray-700 font-medium mr-2">Filter Peringkat:</label>
+                <select id="chart-peringkat" class="border rounded p-2">
+                    <option value="">Semua Peringkat</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="TTA">TTA</option>
+                </select>
+                <label for="chart-tahun" class="text-gray-700 font-medium mr-2">Filter Tahun Pengajuan:</label>
+                <select id="chart-tahun" class="border rounded p-2">
+                    <option value="Semua Tahun">Semua Tahun</option>
+                </select>
+                <button id="update-charts-btn" class="action-btn primary"><i class="fas fa-sync mr-2"></i> Perbarui Grafik</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="w-full">
+                    <h3 class="font-semibold text-gray-800 mb-3">Distribusi Peringkat Akreditasi</h3>
+                    <canvas id="akreditasi-chart" class="w-full h-64 lazy-load-placeholder" data-loaded="false">Memuat Grafik...</canvas>
+                </div>
+                <div class="w-full">
+                    <h3 class="font-semibold text-gray-800 mb-3">Jumlah LKS per Provinsi</h3>
+                    <canvas id="provinsi-chart" class="w-full h-64 lazy-load-placeholder" data-loaded="false">Memuat Grafik...</canvas>
+                </div>
+                <div class="w-full">
+                    <h3 class="font-semibold text-gray-800 mb-3">Distribusi Jenis Layanan</h3>
+                    <canvas id="layanan-chart" class="w-full h-64 lazy-load-placeholder" data-loaded="false">Memuat Grafik...</canvas>
+                </div>
+                <div class="w-full">
+                    <h3 class="font-semibold text-gray-800 mb-3">Tren Tahun Pengajuan</h3>
+                    <canvas id="tahun-chart" class="w-full h-64 lazy-load-placeholder" data-loaded="false">Memuat Grafik...</canvas>
+                </div>
+                <div class="w-full">
+                    <h3 class="font-semibold text-gray-800 mb-3">Jumlah LKS Unik Mengajukan Akreditasi per Tahun</h3>
+                    <canvas id="pengajuan-chart" class="w-full h-64 lazy-load-placeholder" data-loaded="false">Memuat Grafik...</canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification -->
+        <div id="notification" class="notification hidden"></div>
+
+        <!-- Export Modal -->
+        <div id="export-modal" class="modal fixed inset-0 flex items-center justify-center hidden">
+            <div class="modal-content p-6 max-w-lg w-full">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-800">Ekspor Data LKS Lansia</h2>
+                <form id="export-form" class="space-y-6">
+                    <div class="relative">
+                        <label class="block text-gray-700 font-medium mb-2">Pilih Provinsi</label>
+                        <select id="export-provinsi" class="w-full">
+                            <option value="Semua Provinsi">Semua Provinsi</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Pilih Kabupaten/Kota</label>
+                        <select id="export-kabupaten" class="w-full">
+                            <option value="Semua Kabupaten">Semua Kabupaten</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Pilih Peringkat</label>
+                        <select id="export-peringkat" class="w-full">
+                            <option value="">Semua Peringkat</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="TTA">TTA</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Pilih Tahun Pengajuan</label>
+                        <select id="export-tahun" class="w-full">
+                            <option value="Semua Tahun">Semua Tahun</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Format Ekspor</label>
+                        <select id="export-format" class="w-full" required>
+                            <option value="csv">CSV</option>
+                            <option value="excel">Excel</option>
+                            <option value="pdf">PDF</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Batch Size (untuk data besar)</label>
+                        <select id="export-batch-size" class="w-full">
+                            <option value="100">100 baris</option>
+                            <option value="500">500 baris</option>
+                            <option value="1000">1000 baris</option>
+                            <option value="all">Semua</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">
+                            <input type="checkbox" id="export-charts" class="mr-2"> Sertakan Grafik
+                        </label>
+                    </div>
+                    <div class="flex space-x-4">
+                        <button type="submit" id="export-submit-btn" class="action-btn primary"><i class="fas fa-file-export mr-2"></i> Ekspor</button>
+                        <button type="button" id="close-export-btn" class="action-btn"><i class="fas fa-times mr-2"></i> Tutup</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Help Modal -->
+        <div id="help-modal" class="modal fixed inset-0 flex items-center justify-center hidden">
+            <div class="modal-content p-6 max-w-lg w-full">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-800">Petunjuk Penggunaan</h2>
+                <div class="text-gray-700 mb-4">
+                    <p class="mb-2"><strong>Tab Dashboard:</strong> Menampilkan statistik (Total LKS, LKS Terakreditasi A, LKS Dalam/Luar Panti, Total Pengajuan Akreditasi) dan peta interaktif lokasi LKS.</p>
+                    <p class="mb-2"><strong>Tab Data LKS:</strong> Menampilkan daftar LKS Lansia dalam tabel interaktif. Filter berdasarkan provinsi, kabupaten/kota, peringkat, tahun pengajuan, atau status (Semua Data, Duplikat, Data Upload, Upload Terbaru, Data Dummy). Anda dapat mencari, mengurutkan, mengedit, atau menghapus data.</p>
+                    <p class="mb-2"><strong>Tab Input Data:</strong> Digunakan untuk menambah atau memperbarui data LKS Lansia. Masukkan informasi seperti ID Lembaga, Nama, Alamat (opsional), dan lainnya. Koordinat otomatis diambil berdasarkan provinsi. Anda juga bisa mengunggah data dari file Excel (sheet "LKS Lansia").</p>
+                    <p class="mb-2"><strong>Tab Grafik:</strong> Menampilkan visualisasi data (pie chart untuk peringkat akreditasi dan jenis layanan, bar chart untuk jumlah LKS per provinsi, line chart untuk tren tahun pengajuan, bar chart untuk jumlah LKS unik per tahun). Filter grafik berdasarkan provinsi, kabupaten/kota, peringkat, atau tahun.</p>
+                    <p class="mb-2"><strong>Tombol Input Data:</strong> Membuka tab Input Data untuk menambah atau mengedit data.</p>
+                    <p class="mb-2"><strong>Tombol Ekspor:</strong> Ekspor data dalam format CSV, Excel, atau PDF. Gunakan filter provinsi, kabupaten/kota, peringkat, tahun, dan batch size untuk data besar. Sertakan grafik jika diperlukan (hanya untuk PDF).</p>
+                    <p class="mb-2"><strong>Tombol Unggah Excel:</strong> Impor data dari file Excel (sheet "LKS Lansia"). Pastikan kolom sesuai: id_lembaga, nama_lembaga, provinsi, kabupaten, peringkat, jenis_layanan, tahun_pengajuan, dll. Data duplikat akan ditandai.</p>
+                    <p class="mb-2"><strong>Tombol Hapus Data Upload:</strong> Hapus semua data yang diunggah dari Excel.</p>
+                    <p class="mb-2"><strong>Tombol Hapus Data Duplikat:</strong> Hapus semua data yang ditandai sebagai duplikat.</p>
+                    <p class="mb-2"><strong>Tombol Navigasi:</strong> Akses halaman "Management Lansia", "Lansia 5.0", atau "Layanan Lansia".</p>
+                    <p><strong>Catatan:</strong> Data disimpan di localStorage (terbatas ~5-10 MB). Untuk jutaan data, gunakan backend untuk paginasi dan penyimpanan permanen. Data duplikat ditandai dengan warna merah muda di tabel. Hubungi admin untuk masalah data, ekspor, atau performa.</p>
+                </div>
+                <button id="close-help-btn" class="action-btn primary mt-4"><i class="fas fa-times mr-2"></i> Tutup</button>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div id="delete-confirm-modal" class="modal fixed inset-0 flex items-center justify-center hidden">
+            <div class="modal-content p-6 max-w-lg w-full">
+                <h2 class="text-2xl font-semibold mb-6 text-gray-800">Konfirmasi Penghapusan</h2>
+                <p class="text-gray-700 mb-4">Apakah Anda yakin ingin menghapus data ini?</p>
+                <div class="flex space-x-4">
+                    <button id="confirm-delete-btn" class="action-btn bg-red-500 text-white"><i class="fas fa-trash mr-2"></i> Hapus</button>
+                    <button id="cancel-delete-btn" class="action-btn"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- JavaScript -->
+        <script src="/static/js/lks_lansia.js"></script>
+        <script src="/static/js/lks2.js"></script>
+        <script>
+            console.log('Initializing LKS Lansia page at ' + new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }));
+            // Lazy load map
+            function lazyLoadMap() {
+                const mapElement = document.getElementById('map');
+                if (mapElement.dataset.loaded === 'false') {
+                    const observer = new IntersectionObserver((entries) => {
+                        if (entries[0].isIntersecting) {
+                            mapElement.dataset.loaded = 'true';
+                            mapElement.classList.remove('lazy-load-placeholder');
+                            window.dispatchEvent(new Event('loadMap'));
+                            observer.disconnect();
+                        }
+                    });
+                    observer.observe(mapElement);
+                }
+            }
+            // Lazy load charts
+            function lazyLoadCharts() {
+                const charts = ['akreditasi-chart', 'provinsi-chart', 'layanan-chart', 'tahun-chart', 'pengajuan-chart'];
+                charts.forEach(id => {
+                    const chartElement = document.getElementById(id);
+                    if (chartElement.dataset.loaded === 'false') {
+                        const observer = new IntersectionObserver((entries) => {
+                            if (entries[0].isIntersecting) {
+                                chartElement.dataset.loaded = 'true';
+                                chartElement.classList.remove('lazy-load-placeholder');
+                                window.dispatchEvent(new Event('loadCharts'));
+                                observer.disconnect();
+                            }
+                        });
+                        observer.observe(chartElement);
+                    }
+                });
+            }
+            // Handle tab switching
+            function switchTab(tabId) {
+                $('.tab-content').addClass('hidden');
+                $(`#${tabId}-tab`).removeClass('hidden');
+                $('.tab-btn').removeClass('active');
+                $(`.tab-btn[data-tab="${tabId}"]`).addClass('active');
+                if (tabId === 'charts') {
+                    lazyLoadCharts();
+                } else if (tabId === 'dashboard') {
+                    lazyLoadMap();
+                }
+            }
+            // Temporary handler for input-btn to prevent unwanted loading
+            $(document).ready(function() {
+                $('#input-btn').on('click', function(e) {
+                    e.preventDefault();
+                    switchTab('input-data');
+                    $('#loading-indicator').hide(); // Pastikan loading tidak muncul
+                });
+                // Temporary handler for upload-excel-btn
+                $('#upload-excel-btn').on('click', function(e) {
+                    e.preventDefault();
+                    $('<input type="file" accept=".xlsx,.xls">').click().on('change', function(e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            console.log('File selected:', file.name);
+                            // Logika unggah akan ditangani di lks2.js
+                        }
+                    });
+                });
+                // Initialize tabs
+                $('.tab-btn').on('click', function() {
+                    switchTab($(this).data('tab'));
+                });
+                lazyLoadMap();
+                lazyLoadCharts();
+            });
+        </script>
+    </div>
+</body>
+</html>

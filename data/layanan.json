@@ -1,0 +1,356 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.258,
+          -5.425
+        ]
+      },
+      "properties": {
+        "id": "1",
+        "nama_program": "Pelatihan Keterampilan",
+        "jenis_program": "Pelatihan",
+        "lokasi": {
+          "provinsi": "Lampung",
+          "kab_kota": "Bandar Lampung",
+          "kecamatan": "Telukbetung Utara",
+          "desa": "Kupang Teba"
+        },
+        "alamat": "Kupang Teba, Telukbetung Utara, Bandar Lampung, Lampung",
+        "koordinat": [
+          105.258,
+          -5.425
+        ],
+        "jadwal_mulai": "2025-07-01",
+        "jadwal_selesai": "2025-07-15",
+        "peserta": 50,
+        "anggaran": 50000000,
+        "status": "Aktif",
+        "fasilitas_terkait": "Panti Asuhan Budi Mulia"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.8456,
+          -6.2145
+        ]
+      },
+      "properties": {
+        "id": "2",
+        "nama_program": "Pemberdayaan UMKM",
+        "jenis_program": "UMKM",
+        "lokasi": {
+          "provinsi": "DKI Jakarta",
+          "kab_kota": "Jakarta Timur",
+          "kecamatan": "Jatinegara",
+          "desa": "Kampung Melayu"
+        },
+        "alamat": "Kampung Melayu, Jatinegara, Jakarta Timur, DKI Jakarta",
+        "koordinat": [
+          106.8456,
+          -6.2145
+        ],
+        "jadwal_mulai": "2025-08-01",
+        "jadwal_selesai": "2025-08-30",
+        "peserta": 30,
+        "anggaran": 75000000,
+        "status": "Direncanakan",
+        "fasilitas_terkait": "Sentra Kreasi Atensi Jakarta"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.27876891195774,
+          -4.506734681248464
+        ]
+      },
+      "properties": {
+        "id": "3",
+        "nama_program": "Posyandu Lansia",
+        "jenis_program": "Posyandu",
+        "lokasi": {
+          "provinsi": "Sulawesi Selatan",
+          "kab_kota": "Bone",
+          "kecamatan": "Bontocani",
+          "desa": "Mattiro Walie"
+        },
+        "alamat": "Mattiro Walie, Bontocani, Bone, Sulawesi Selatan",
+        "koordinat": [
+          120.27876891195774,
+          -4.506734681248464
+        ],
+        "jadwal_mulai": "2025-06-01",
+        "jadwal_selesai": "2025-06-30",
+        "peserta": 40,
+        "anggaran": 30000000,
+        "status": "Selesai",
+        "fasilitas_terkait": "RPTC Sulsel"
+      }
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          106.85,
+          -6.22
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "anggaran": 5000000,
+        "fasilitas_terkait": "Sentra Kreasi Atensi Jakarta",
+        "id": "5",
+        "jadwal_mulai": "2025-07-05",
+        "jadwal_selesai": "2025-07-05",
+        "jenis_program": "Posyandu",
+        "koordinat": [
+          106.85,
+          -6.22
+        ],
+        "lokasi": {
+          "desa": "Cipinang",
+          "kab_kota": "Jakarta Timur",
+          "kecamatan": "Jatinegara",
+          "provinsi": "DKI Jakarta"
+        },
+        "nama_program": "Karang Taruna Jakarta",
+        "peserta": 20,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          106.85,
+          -6.22
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "anggaran": 5000000,
+        "fasilitas_terkait": "Sentra Kreasi Atensi Jakarta",
+        "id": "5",
+        "jadwal_mulai": "2025-07-05",
+        "jadwal_selesai": "2025-07-05",
+        "jenis_program": "Posyandu",
+        "koordinat": [
+          106.85,
+          -6.22
+        ],
+        "lokasi": {
+          "desa": "Cipinang",
+          "kab_kota": "Jakarta Timur",
+          "kecamatan": "Jatinegara",
+          "provinsi": "DKI Jakarta"
+        },
+        "nama_program": "Karang Taruna Jakarta",
+        "peserta": 20,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          115.63264813274145,
+          -3.4468335079984334
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "anggaran": 10000000,
+        "fasilitas_terkait": "",
+        "id": "8e4ffd06-e35a-48d7-8db5-034e565af95d",
+        "jadwal_mulai": "2025-07-01",
+        "jadwal_selesai": "2025-07-05",
+        "jenis_program": "Pelatihan",
+        "koordinat": [
+          115.63264813274145,
+          -3.4468335079984334
+        ],
+        "lokasi": {
+          "desa": "Pelatihan Balet",
+          "kab_kota": "Bandar Lampung",
+          "kecamatan": "Telukbetung Utara",
+          "nama": "Pelatihan Balet",
+          "provinsi": "Lampung"
+        },
+        "nama_program": "Pelatihan Balet",
+        "peserta": 21,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          117.37048018723726,
+          -8.461881096081086
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Labuan Sumbawa, Labuhan Badas, Kabupaten Sumbawa, Nusa Tenggara Bar.",
+        "anggaran": 1000000,
+        "fasilitas_terkait": "",
+        "id": "72f6b258-ac91-4baf-b582-33a730c5c450",
+        "jadwal_mulai": "2025-08-03",
+        "jadwal_selesai": "2025-08-23",
+        "jenis_program": "Pelatihan",
+        "koordinat": [
+          117.37048018723726,
+          -8.461881096081086
+        ],
+        "lokasi": {
+          "desa": "Labuan Sumbawa",
+          "kab_kota": "Labuhan Badas",
+          "kecamatan": "Labuan Sumbawa",
+          "provinsi": "Kabupaten Sumbawa"
+        },
+        "nama_program": "Pelatihan Renang",
+        "peserta": 7,
+        "status": "Direncanakan"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          118.72768867760897,
+          -8.45340894571422
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Kolo, Kec. Asakota, Kab. Bima, Nusa Tenggara Bar.",
+        "anggaran": 1000000,
+        "fasilitas_terkait": "",
+        "id": "8100daf7-a9ea-49e4-86c9-b26a3e5cdd87",
+        "jadwal_mulai": "2025-07-03",
+        "jadwal_selesai": "2025-07-10",
+        "jenis_program": "Posyandu",
+        "koordinat": [
+          118.72768867760897,
+          -8.45340894571422
+        ],
+        "lokasi": {
+          "desa": "Kolo",
+          "kab_kota": "Bima",
+          "kecamatan": "Asakota",
+          "provinsi": "Nusa Tenggara Bar."
+        },
+        "nama_program": "XXXXX",
+        "peserta": 11,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -5.425,
+          105.258
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Kota Tua, Jl. Lada No.1 4, RT.4/RW.6, Pinangsia, Kec. Taman Sari, Kota Jakarta Barat, Daerah Khusus Ibukota Jakarta 11110",
+        "anggaran": 100000000,
+        "fasilitas_terkait": "",
+        "geocoding_failed": true,
+        "id": "15e26798-a983-4939-a71a-bddb8f221e33",
+        "jadwal_mulai": "2025-07-03",
+        "jadwal_selesai": "2025-07-16",
+        "jenis_program": "UMKM",
+        "koordinat": [
+          -5.425,
+          105.258
+        ],
+        "lokasi": {
+          "desa": "Kota Tua",
+          "kab_kota": "RT.4/RW.6",
+          "kecamatan": "Jl. Lada No.1 4",
+          "provinsi": "Pinangsia"
+        },
+        "nama_program": "KRS",
+        "peserta": 11,
+        "status": "Aktif"
+      },
+      "type": "Feature"
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          109.50701,
+          -6.95635
+        ]
+      },
+      "properties": {
+        "id": "40cf90cc-4bd3-4ea5-9438-3146c0ee961b",
+        "nama_program": "xxx",
+        "jenis_program": "Pelatihan",
+        "alamat": "2FFF+J67, Jl. Ky Oesman, Langensari, Karangbrai, Kec. Bodeh, Kabupaten Pemalang, Jawa Tengah 52365",
+        "jadwal_mulai": "2025-07-24",
+        "jadwal_selesai": "2025-07-29",
+        "peserta": 11,
+        "anggaran": 111111111,
+        "status": "Aktif",
+        "fasilitas_terkait": "",
+        "lokasi": {
+          "provinsi": "Karangbrai",
+          "kab_kota": "Langensari",
+          "kecamatan": "Jl. Ky Oesman",
+          "desa": "2FFF+J67"
+        },
+        "koordinat": [
+          109.50701,
+          -6.95635
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          122.1233756840229,
+          -4.449814485532148
+        ]
+      },
+      "properties": {
+        "id": "7680da28-6981-41c7-a434-fabe802ee16c",
+        "nama_program": "OLAHRAGA MOBILE LEGEND2",
+        "jenis_program": "UMKM",
+        "alamat": "Jl. Jend. Sudirman, Telutu Jaya, Kec. Tinanggea, Kabupaten Konawe Selatan, Sulawesi Tenggara 93885",
+        "jadwal_mulai": "2025-06-30",
+        "jadwal_selesai": "2025-07-11",
+        "peserta": 111,
+        "anggaran": 1000000,
+        "status": "Direncanakan",
+        "fasilitas_terkait": "",
+        "lokasi": {
+          "provinsi": "Kabupaten Konawe Selatan",
+          "kab_kota": "Kec. Tinanggea",
+          "kecamatan": "Telutu Jaya",
+          "desa": "Jl. Jend. Sudirman"
+        },
+        "koordinat": [
+          122.1233756840229,
+          -4.449814485532148
+        ]
+      }
+    }
+  ]
+}

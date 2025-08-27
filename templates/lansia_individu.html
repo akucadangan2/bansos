@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGIS Kemensos - Manajemen Data Lansia</title>
+    <link rel="icon" type="image/png" href="/static/images/favicon.png">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://kit.fontawesome.com/6b27f3b4a8.js" crossorigin="anonymous"></script>
+    <script src="/static/js/rbac.js"></script>
+    <script src="/static/js/lansia_individu.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #1a202c;
+            background: #f7fafc;
+            margin: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 2000px; /* Sesuaikan dengan lebar maksimum hingga garis merah */
+            padding: 0 1rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .btn-primary {
+            background: #2b6cb0;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: #2c5282;
+            transform: translateY(-1px);
+        }
+        .btn-primary:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: #a0aec0;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: #718096;
+            transform: translateY(-1px);
+        }
+        .btn-help {
+            background: #68d391;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            transition: all 0.3s ease;
+        }
+        .btn-help:hover {
+            background: #4ade80;
+            transform: translateY(-1px);
+        }
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+        }
+        .modal {
+            display: none;
+            z-index: 1000;
+            background: rgba(0,0,0,0.7);
+        }
+        .modal-content {
+            max-height: 85vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #2b6cb0 #f7fafc;
+        }
+        #map, #preview-map, #search-map {
+            min-height: 300px;
+            border-radius: 0.375rem;
+            border: 1px solid #e2e8f0;
+        }
+        #map-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        #map {
+            flex-grow: 1;
+        }
+        .tooltip {
+            background: #e6fffa;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            border: 1px solid #319795;
+            font-size: 0.85rem;
+            color: #1a202c;
+        }
+        .accessibility-mode {
+            font-size: 1.2rem !important;
+            background: #e6fffa !important;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-content {
+            animation: fadeIn 0.3s ease;
+        }
+        .notification {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: #38a169;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 2000;
+            display: none;
+        }
+        .lansia-individu-table {
+            max-height: 300px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #2b6cb0 #f7fafc;
+        }
+        .table-modern th, .table-modern td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .table-modern th {
+            background: #edf2f7;
+            font-weight: 600;
+            text-align: left;
+        }
+        .table-modern tr:hover {
+            background: #f7fafc;
+        }
+        .lansia-name {
+            cursor: pointer;
+            color: #2b6cb0;
+            text-decoration: underline;
+        }
+        .lansia-name:hover {
+            color: #2c5282;
+        }
+        .stats-card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+        .stats-card canvas {
+            width: 100% !important;
+            height: 200px !important;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stats-item {
+            background: #f7fafc;
+            border-radius: 0.375rem;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .stats-item:hover {
+            transform: translateY(-2px);
+        }
+        .stats-item h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2b6cb0;
+            margin-bottom: 0.5rem;
+        }
+        .stats-item p {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .detail-item i {
+            color: #2b6cb0;
+        }
+        @media (max-width: 640px) {
+            body {
+                font-size: 0.85rem;
+            }
+            #map, #preview-map, #search-map {
+                height: 300px;
+            }
+            .card {
+                padding: 1rem;
+            }
+            .modal-content {
+                max-width: 90vw;
+            }
+            .table-modern th, .table-modern td {
+                padding: 0.5rem;
+            }
+            .stats-card canvas {
+                height: 150px !important;
+            }
+            .stats-item h4 {
+                font-size: 0.9rem;
+            }
+            .stats-item p {
+                font-size: 1.25rem;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <nav class="bg-white shadow fixed top-0 w-full z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <img src="/static/images/Kemensos.png" alt="Logo Kemensos" class="w-10 h-10 rounded-full">
+                <span class="text-xl font-semibold text-gray-800">Manajemen Data Lansia</span>
+            </div>
+                </button>
+                <a href="/" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Bantuan Sosial</a>
+                <a href="/fasilitas" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Fasilitas</a>
+                <a href="/layanan" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Layanan</a>
+                <a href="/bencana" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Bencana</a>
+                <a href="/lansia" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Lansia</a>
+                <a href="/lansia_komprehensif" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Komprehensif Lansia</a>
+                {% if user_info.is_authenticated and user_info.role == 'admin' %}
+                    <a href="/pengajuan" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">
+                        Review Pengajuan
+                        <span class="notification-bell">
+                            <i class="fas fa-bell"></i>
+                            <span id="pending-count-nav" class="badge bg-red-500 text-white text-xs rounded-full px-2 py-1"></span>
+                        </span>
+                    </a>
+                {% endif %}
+                {% if user_info.is_authenticated %}
+                    <a href="/akun" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Akun</a>
+                    <a href="/logout" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Logout</a>
+                {% else %}
+                    <a href="/auth?tab=login" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Login</a>
+                    <a href="/auth?tab=register" class="px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <div class="container mx-auto mt-20 px-4">
+        <div class="card">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-user-friends"></i> Manajemen Data Lansia
+            </h2>
+            <div class="flex flex-col lg:flex-row gap-4 h-full">
+                <div class="lg:w-2/3" id="map-container">
+                    <div id="map"></div>
+                </div>
+                <div class="lg:w-1/3" id="stats-container">
+                    <div class="card mb-4">
+                        <h3 class="text-lg font-medium mb-3">Filter Data Lansia</h3>
+                        <select id="filter-status-sosial" class="w-full p-2 rounded border border-gray-300 text-sm mb-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="">Semua Status Sosial</option>
+                            <option value="Fakir Miskin">Fakir Miskin</option>
+                            <option value="Rentan Miskin">Rentan Miskin</option>
+                            <option value="Mampu">Mampu</option>
+                        </select>
+                        <select id="filter-provinsi" class="w-full p-2 rounded border border-gray-300 text-sm mb-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="">Semua Provinsi</option>
+                        </select>
+                        <select id="filter-dtks-status" class="w-full p-2 rounded border border-gray-300 text-sm mb-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="">Semua Status DTKS</option>
+                            <option value="Terdaftar">Terdaftar</option>
+                            <option value="Belum Terdaftar">Belum Terdaftar</option>
+                            <option value="Pengusulan Sedang Diproses">Pengusulan Sedang Diproses</option>
+                        </select>
+                        <div class="flex gap-2">
+                            <input type="text" id="search-nik" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Masukkan NIK untuk mencari">
+                            <button id="search-btn" class="btn-primary text-sm"><i class="fas fa-search"></i> Cari</button>
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <h3 class="text-lg font-medium mb-4 flex items-center gap-2"><i class="fas fa-chart-bar"></i> Statistik Lansia</h3>
+                        <div class="stats-grid" id="stats-grid"></div>
+                        <div class="mt-4">
+                            <h4 class="text-sm font-medium mb-2">Distribusi Status Sosial</h4>
+                            <canvas id="status-sosial-chart" class="w-full"></canvas>
+                        </div>
+                        <div class="mt-4">
+                            <h4 class="text-sm font-medium mb-2">Distribusi Status DTKS</h4>
+                            <canvas id="dtks-status-chart" class="w-full"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 flex gap-3">
+                <button id="input-btn" class="btn-primary text-sm"><i class="fas fa-plus"></i> Tambah Data Lansia</button>
+                <button id="help-btn" class="btn-help text-sm" title="Petunjuk Input Data"><i class="fas fa-question-circle"></i></button>
+                <button id="export-csv-btn" class="btn-primary text-sm"><i class="fas fa-download"></i> Export CSV</button>
+                <button id="export-excel-btn" class="btn-primary text-sm"><i class="fas fa-file-excel"></i> Export Excel</button>
+                <button id="export-pdf-btn" class="btn-primary text-sm"><i class="fas fa-file-pdf"></i> Export PDF</button>
+            </div>
+            <div class="mt-4">
+                <table class="w-full text-sm border-collapse table-modern lansia-individu-table">
+                    <thead>
+                        <tr>
+                            <th class="p-2">NIK</th>
+                            <th class="p-2">Nama</th>
+                            <th class="p-2">Usia</th>
+                            <th class="p-2">Kondisi Kesehatan</th>
+                            <th class="p-2">Status Sosial</th>
+                            <th class="p-2">Alamat</th>
+                            <th class="p-2">Status DTKS</th>
+                            <th class="p-2">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lansia-individu-table"></tbody>
+                </table>
+            </div>
+            <div id="input-modal" class="modal fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden">
+                <div class="card w-full max-w-2xl p-6 modal-content">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-user-plus"></i> Tambah Data Lansia
+                    </h3>
+                    <form id="input-form" class="space-y-4">
+                        <input type="hidden" id="edit-nik">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">NIK</label>
+                                <input type="text" id="nik" name="nik" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" maxlength="16" required>
+                                <button type="button" id="check-dtks-btn" class="btn-primary text-sm mt-1"><i class="fas fa-search"></i> Cek DTKS</button>
+                                <p id="dtks-status" class="text-xs text-gray-500 mt-1"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Nama</label>
+                                <input type="text" id="nama" name="nama" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Usia</label>
+                            <input type="number" id="usia" name="usia" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" min="60" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Kondisi Kesehatan</label>
+                            <select id="kondisi_kesehatan" name="kondisi_kesehatan" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" multiple>
+                                <option value="Diabetes">Diabetes</option>
+                                <option value="Hipertensi">Hipertensi</option>
+                                <option value="Penyakit Jantung">Penyakit Jantung</option>
+                                <option value="Gangguan Penglihatan">Gangguan Penglihatan</option>
+                                <option value="Tidak Bisa Berdiri/Lumpuh">Lumpuh dan Tidak Bisa Berdiri</option>
+                                <option value="Lainnya">Lainnya</option>
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Tahan Ctrl untuk memilih beberapa opsi</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Status Sosial</label>
+                            <select id="status_sosial" name="status_sosial" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" required>
+                                <option value="Fakir Miskin">Fakir Miskin</option>
+                                <option value="Rentan Miskin">Rentan Miskin</option>
+                                <option value="Mampu">Mampu</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Alamat</label>
+                            <textarea id="alamat" name="alamat" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" rows="3" required></textarea>
+                            <a id="alamat-link" href="#" target="_blank" class="text-blue-600 hover:underline text-xs flex items-center gap-1 mt-1">
+                                <i class="fas fa-map-marker-alt"></i> Lihat di Google Maps
+                            </a>
+                        </div>
+                        <div id="preview-map" class="w-full h-48 rounded border border-gray-300"></div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Status Monitoring</label>
+                            <select id="status_monitoring" name="status_monitoring" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" required>
+                                <option value="Aktif">Aktif</option>
+                                <option value="Selesai">Selesai</option>
+                                <option value="Tertunda">Tertunda</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Evaluasi Layanan</label>
+                            <select id="evaluasi_layanan" name="evaluasi_layanan" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" required>
+                                <option value="Memuaskan">Memuaskan</option>
+                                <option value="Cukup">Cukup</option>
+                                <option value="Kurang">Kurang</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Status DTKS</label>
+                            <select id="dtks-status-select" name="dtks_status" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" required>
+                                <option value="Belum Terdaftar">Belum Terdaftar</option>
+                                <option value="Terdaftar">Terdaftar</option>
+                                <option value="Pengusulan Sedang Diproses">Pengusulan Sedang Diproses</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-end gap-3">
+                            <button type="button" id="cari-koordinat" class="btn-primary text-sm"><i class="fas fa-search-location"></i> Cari Koordinat</button>
+                            <button type="submit" id="simpan-btn" class="btn-primary text-sm"><i class="fas fa-save"></i> Simpan</button>
+                            <button type="button" id="batal-btn" class="btn-secondary text-sm"><i class="fas fa-times"></i> Batal</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="atensi-modal" class="modal fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden">
+                <div class="card w-full max-w-2xl p-6 modal-content">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-history"></i> Riwayat ATENSI
+                    </h3>
+                    <div id="atensi-table" class="mb-4">
+                        <table class="w-full text-sm border-collapse table-modern">
+                            <thead>
+                                <tr>
+                                    <th class="p-2">Program</th>
+                                    <th class="p-2">Tanggal</th>
+                                    <th class="p-2">Status</th>
+                                    <th class="p-2">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="atensi-table-body"></tbody>
+                        </table>
+                    </div>
+                    <form id="atensi-form" class="space-y-4">
+                        <input type="hidden" id="atensi-nik">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Program</label>
+                                <input type="text" id="atensi-program" name="program" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Tanggal</label>
+                                <input type="date" id="atensi-tanggal" name="tanggal" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Status</label>
+                            <select id="atensi-status" name="status" class="w-full p-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500" required>
+                                <option value="Selesai">Selesai</option>
+                                <option value="Sedang Berjalan">Sedang Berjalan</option>
+                                <option value="Tertunda">Tertunda</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-end gap-3">
+                            <button type="submit" id="simpan-atensi-btn" class="btn-primary text-sm"><i class="fas fa-save"></i> Tambah</button>
+                            <button type="button" id="batal-atensi-btn" class="btn-secondary text-sm"><i class="fas fa-times"></i> Tutup</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="search-modal" class="modal fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden">
+                <div class="card w-full max-w-4xl p-6 modal-content">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-user"></i> Detail Lansia
+                    </h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div id="search-result" class="space-y-2 text-sm"></div>
+                        <div id="search-map" class="w-full h-48 rounded border border-gray-300"></div>
+                    </div>
+                    <div class="flex justify-end gap-3 mt-4">
+                        {% if user_info.is_authenticated and user_info.role == 'admin' %}
+                            <button id="edit-from-search-btn" class="btn-primary text-sm hidden"><i class="fas fa-edit"></i> Edit</button>
+                        {% endif %}
+                        <button id="atensi-from-search-btn" class="btn-primary text-sm"><i class="fas fa-history"></i> Lihat Riwayat ATENSI</button>
+                        <button id="close-search-btn" class="btn-secondary text-sm"><i class="fas fa-times"></i> Tutup</button>
+                    </div>
+                </div>
+            </div>
+            <div id="help-modal" class="modal fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden">
+                <div class="card w-full max-w-lg p-6 modal-content">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-question-circle"></i> Petunjuk Input Data Lansia
+                    </h3>
+                    <div class="text-sm space-y-2">
+                        <p>Untuk menambahkan data lansia, ikuti langkah-langkah berikut:</p>
+                        <ol class="list-decimal pl-5">
+                            <li>Klik tombol <strong>Tambah Data Lansia</strong> di bawah tabel.</li>
+                            <li>Isi semua field yang diperlukan:
+                                <ul class="list-disc pl-5 mt-1">
+                                    <li><strong>NIK:</strong> Masukkan 16 digit NIK, lalu klik <strong>Cek DTKS</strong> untuk memeriksa status DTKS.</li>
+                                    <li><strong>Nama:</strong> Masukkan nama lengkap lansia.</li>
+                                    <li><strong>Usia:</strong> Masukkan usia (minimal 60 tahun).</li>
+                                    <li><strong>Kondisi Kesehatan:</strong> Pilih kondisi kesehatan (tekan Ctrl untuk memilih lebih dari satu).</li>
+                                    <li><strong>Status Sosial:</strong> Pilih status sosial (Fakir Miskin, Rentan Miskin, atau Mampu).</li>
+                                    <li><strong>Alamat:</strong> Masukkan alamat lengkap, lalu klik <strong>Cari Koordinat</strong> untuk menentukan lokasi di peta.</li>
+                                    <li><strong>Status Monitoring:</strong> Pilih status (Aktif, Selesai, atau Tertunda).</li>
+                                    <li><strong>Evaluasi Layanan:</strong> Pilih evaluasi (Memuaskan, Cukup, atau Kurang).</li>
+                                    <li><strong>Status DTKS:</strong> Pilih status DTKS (otomatis terisi jika NIK terdaftar).</li>
+                                </ul>
+                            </li>
+                            <li>Klik <strong>Simpan</strong> untuk menyimpan data atau <strong>Batal</strong> untuk membatalkan.</li>
+                        </ol>
+                        <p class="text-xs text-gray-500">Catatan: Pastikan semua field diisi dengan benar untuk menghindari error.</p>
+                    </div>
+                    <div class="flex justify-end mt-4">
+                        <button id="close-help-btn" class="btn-secondary text-sm"><i class="fas fa-times"></i> Tutup</button>
+                    </div>
+                </div>
+            </div>
+            <div id="notification" class="notification"></div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <script>
+        // Update jumlah pengajuan tertunda
+        function updatePendingCount() {
+            console.log('Updating pending count...');
+            fetch('/api/pending_submissions')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('pending-count');
+                    const badgeNav = document.getElementById('pending-count-nav');
+                    if (badge && badgeNav) {
+                        badge.textContent = data.count || 0;
+                        badgeNav.textContent = data.count || 0;
+                        badge.style.display = data.count > 0 ? 'inline' : 'none';
+                        badgeNav.style.display = data.count > 0 ? 'inline' : 'none';
+                        console.log('Pending count updated:', data.count);
+                    } else {
+                        console.error('Pending count elements not found');
+                    }
+                })
+                .catch(error => console.error('Error fetching pending submissions:', error));
+        }
+
+        // Inisialisasi peta pratinjau
+        function initPreviewMap() {
+            const mapElement = document.getElementById('preview-map');
+            if (!mapElement) {
+                console.error('Preview map element not found');
+                return;
+            }
+            if (window.previewMap) return;
+            try {
+                window.previewMap = L.map('preview-map').setView([-6.2145, 106.8456], 10);
+                const baseLayers = {
+                    "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap'
+                    }),
+                    "MapTiler Satellite": L.tileLayer('https://api.maptiler.com/maps/satellite/{z}/{x}/{y}.jpg?key=IK5jI16RtevcjqQqE5n9', {
+                        attribution: '© MapTiler'
+                    }),
+                    "Esri World Imagery": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: '© Esri'
+                    })
+                };
+                baseLayers["OpenStreetMap"].addTo(window.previewMap);
+                L.control.layers(baseLayers).addTo(window.previewMap);
+                window.previewMap.on('click', function(e) {
+                    if (window.previewMarker) window.previewMap.removeLayer(window.previewMarker);
+                    window.previewMarker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(window.previewMap);
+                    document.getElementById('alamat').dataset.lat = e.latlng.lat;
+                    document.getElementById('alamat').dataset.lon = e.latlng.lng;
+                    document.getElementById('alamat-link').href = `https://www.google.com/maps/search/?api=1&query=${e.latlng.lat},${e.latlng.lng}`;
+                    showNotification('Lokasi dipilih pada peta!');
+                    console.log('Preview map clicked: Lat', e.latlng.lat, 'Lon', e.latlng.lng);
+                });
+                console.log('Preview map initialized');
+            } catch (error) {
+                console.error('Failed to initialize preview map:', error);
+            }
+        }
+
+        // Inisialisasi peta pencarian
+        function initSearchMap(lansia) {
+            const mapElement = document.getElementById('search-map');
+            if (!mapElement) {
+                console.error('Search map element not found');
+                return;
+            }
+            if (window.searchMap) window.searchMap.remove();
+            try {
+                window.searchMap = L.map('search-map').setView(lansia.koordinat ? [lansia.koordinat[1], lansia.koordinat[0]] : [-6.2145, 106.8456], lansia.koordinat ? 13 : 5);
+                const baseLayers = {
+                    "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap'
+                    }),
+                    "MapTiler Satellite": L.tileLayer('https://api.maptiler.com/maps/satellite/{z}/{x}/{y}.jpg?key=IK5jI16RtevcjqQqE5n9', {
+                        attribution: '© MapTiler'
+                    }),
+                    "Esri World Imagery": L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: '© Esri'
+                    })
+                };
+                baseLayers["OpenStreetMap"].addTo(window.searchMap);
+                L.control.layers(baseLayers).addTo(window.searchMap);
+                if (lansia.koordinat) {
+                    L.marker([lansia.koordinat[1], lansia.koordinat[0]]).addTo(window.searchMap)
+                        .bindPopup(`<b>${lansia.nama}</b><br>${lansia.alamat}`);
+                }
+                console.log('Search map initialized for NIK:', lansia.nik);
+            } catch (error) {
+                console.error('Failed to initialize search map:', error);
+            }
+        }
+
+        // Pasang event listener
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM content loaded, initializing...');
+            updatePendingCount();
+            setInterval(updatePendingCount, 30000);
+            const accessibilityBtn = document.getElementById('accessibility-btn');
+            if (accessibilityBtn) {
+                accessibilityBtn.addEventListener('click', () => {
+                    document.body.classList.toggle('accessibility-mode');
+                    localStorage.setItem('accessibilityMode', document.body.classList.contains('accessibility-mode'));
+                    console.log('Accessibility mode toggled');
+                    adjustMapHeight();
+                });
+            } else {
+                console.error('Accessibility button not found');
+            }
+            if (localStorage.getItem('accessibilityMode') === 'true') {
+                document.body.classList.add('accessibility-mode');
+            }
+
+            const buttons = {
+                'input-btn': () => {
+                    const form = document.getElementById('input-form');
+                    if (form) {
+                        form.reset();
+                        document.getElementById('edit-nik').value = '';
+                        document.getElementById('dtks-status').textContent = '';
+                        document.getElementById('dtks-status').dataset.status = '';
+                        document.getElementById('dtks-status-select').value = 'Belum Terdaftar';
+                        document.getElementById('input-modal').classList.remove('hidden');
+                        initPreviewMap();
+                        console.log('Input modal opened');
+                    } else {
+                        console.error('Input form not found');
+                    }
+                },
+                'batal-btn': () => {
+                    const modal = document.getElementById('input-modal');
+                    if (modal) {
+                        modal.classList.add('hidden');
+                        document.getElementById('input-form').reset();
+                        document.getElementById('dtks-status').textContent = '';
+                        document.getElementById('dtks-status').dataset.status = '';
+                        if (window.previewMarker) window.previewMap.removeLayer(window.previewMarker);
+                        console.log('Input modal closed');
+                    }
+                },
+                'simpan-btn': (e) => {
+                    e.preventDefault();
+                    const form = document.getElementById('input-form');
+                    if (form) {
+                        form.dispatchEvent(new Event('submit'));
+                        console.log('Simpan button clicked');
+                    }
+                },
+                'cari-koordinat': (e) => {
+                    const alamat = document.getElementById('alamat');
+                    if (alamat) cariKoordinat(alamat.value.trim(), e.target);
+                },
+                'check-dtks-btn': (e) => {
+                    const nik = document.getElementById('nik');
+                    if (nik) checkDTKS(nik.value.trim(), e.target);
+                },
+                'export-csv-btn': exportToCSV,
+                'export-excel-btn': exportToExcel,
+                'export-pdf-btn': exportToPDF,
+                'batal-atensi-btn': () => {
+                    document.getElementById('atensi-modal').classList.add('hidden');
+                    document.getElementById('atensi-form').reset();
+                    console.log('Atensi modal closed');
+                },
+                'simpan-atensi-btn': (e) => {
+                    e.preventDefault();
+                    const form = document.getElementById('atensi-form');
+                    if (form) {
+                        form.dispatchEvent(new Event('submit'));
+                        console.log('Simpan atensi button clicked');
+                    }
+                },
+                'search-btn': () => {
+                    const nik = document.getElementById('search-nik').value.trim();
+                    searchByNIK(nik);
+                },
+                'close-search-btn': () => {
+                    document.getElementById('search-modal').classList.add('hidden');
+                    if (window.searchMap) window.searchMap.remove();
+                    console.log('Search modal closed');
+                },
+                'edit-from-search-btn': (e) => {
+                    const nik = e.target.dataset.nik;
+                    if (nik) handleEditLansia({ target: { dataset: { nik } } });
+                    document.getElementById('search-modal').classList.add('hidden');
+                    if (window.searchMap) window.searchMap.remove();
+                    console.log('Edit from search triggered for NIK:', nik);
+                },
+                'atensi-from-search-btn': (e) => {
+                    const nik = e.target.dataset.nik;
+                    document.getElementById('atensi-nik').value = nik;
+                    updateAtensiTable(nik);
+                    document.getElementById('atensi-modal').classList.remove('hidden');
+                    document.getElementById('search-modal').classList.add('hidden');
+                    if (window.searchMap) window.searchMap.remove();
+                    console.log('Atensi from search triggered for NIK:', nik);
+                },
+                'help-btn': () => {
+                    document.getElementById('help-modal').classList.remove('hidden');
+                    console.log('Help modal opened');
+                },
+                'close-help-btn': () => {
+                    document.getElementById('help-modal').classList.add('hidden');
+                    console.log('Help modal closed');
+                }
+            };
+
+            Object.entries(buttons).forEach(([id, handler]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.removeEventListener(id.includes('filter') ? 'change' : 'click', handler);
+                    element.addEventListener(id.includes('filter') ? 'change' : 'click', handler);
+                    console.log(`Event listener attached for ${id}`);
+                } else {
+                    console.error(`Element with ID ${id} not found`);
+                }
+            });
+
+            const inputForm = document.getElementById('input-form');
+            if (inputForm) inputForm.addEventListener('submit', handleFormSubmit);
+            const atensiForm = document.getElementById('atensi-form');
+            if (atensiForm) atensiForm.addEventListener('submit', handleAtensiFormSubmit);
+            const alamatInput = document.getElementById('alamat');
+            if (alamatInput) {
+                alamatInput.addEventListener('input', () => {
+                    const alamat = alamatInput.value;
+                    const alamatLink = document.getElementById('alamat-link');
+                    alamatLink.href = alamat ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(alamat)}` : '#';
+                    console.log('Alamat input updated:', alamat);
+                });
+            }
+
+            // Inisialisasi peta utama dan muat data
+            fetchUserInfo().then(() => {
+                initMainMap();
+                loadData();
+                console.log('Initial data load triggered');
+            });
+        });
+    </script>
+</body>
+</html>

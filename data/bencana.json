@@ -1,0 +1,87 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          105.258,
+          -5.425
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "alamat": "Jl. KH. Ahmad Dahlan, RT.4/RW.12, Barean, Sidoharjo, Kec. Pacitan, Kabupaten Pacitan, Jawa Timur 63514",
+        "bantuan": [
+          {
+            "instansi": "",
+            "jenis": "",
+            "jumlah": "",
+            "waktu": ""
+          }
+        ],
+        "fotos": [],
+        "geocoding_failed": true,
+        "id": "1751345922976",
+        "jenis_bencana": "Gempa bumi",
+        "kebutuhan_mendesak": "",
+        "korban": {
+          "fasilitas_umum": "",
+          "luka_berat": 0,
+          "luka_ringan": 0,
+          "meninggal": 0,
+          "pengungsi": 0,
+          "rumah_rusak_berat": 0,
+          "rumah_rusak_ringan": 0,
+          "rumah_rusak_sedang": 0
+        },
+        "laporan": null,
+        "lokasi_nama": "Pacitan",
+        "luas_terdampak": 11,
+        "tingkat_keparahan": "Ringan",
+        "waktu_kejadian": "2025-07-01T11:58"
+      },
+      "type": "Feature"
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          113.25077,
+          -7.194952
+        ]
+      },
+      "properties": {
+        "id": "1753340495196",
+        "jenis_bencana": "Gempa bumi",
+        "lokasi_nama": "Test Data",
+        "alamat": "Rw. VI, Gn. Sekar, Kec. Sampang, Kabupaten Sampang, Jawa Timur 69216",
+        "waktu_kejadian": "2025-07-24T14:01",
+        "tingkat_keparahan": "Ringan",
+        "luas_terdampak": 1,
+        "kebutuhan_mendesak": "tidak ada",
+        "korban": {
+          "meninggal": 0,
+          "luka_berat": 0,
+          "luka_ringan": 0,
+          "pengungsi": 0,
+          "rumah_rusak_berat": 0,
+          "rumah_rusak_sedang": 0,
+          "rumah_rusak_ringan": 0,
+          "fasilitas_umum": ""
+        },
+        "bantuan": [
+          {
+            "jenis": "",
+            "instansi": "",
+            "jumlah": "",
+            "waktu": ""
+          }
+        ],
+        "geocoding_failed": false,
+        "fotos": [],
+        "laporan": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengelolaan Komprehensif Lansia - WebGIS Bansos</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <link rel="icon" type="image/png" href="/static/images/favicon.png">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="/static/js/rbac.js"></script>
+    <script src="/static/js/lansia_komprehensif.js"></script>
+    <script src="/static/js/lansia_komprehensif_tables.js"></script>
+    <script src="/static/js/lansia_komprehensif_handlers.js"></script>
+    <script src="/static/js/lansia_komprehensif_handlers_utils.js"></script>
+    <script src="/static/js/lansia_komprehensif_handlers_policy.js"></script>
+    <style>
+        /* macOS-inspired styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 10px 20px;
+            margin: 0 5px 10px 0;
+            color: #333;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        .tab-btn.active {
+            background: #007bff;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .action-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 10px 20px;
+            color: #333;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        #map {
+            height: 300px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        @media (max-width: 640px) {
+            #map { height: 200px; }
+        }
+        table {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        th {
+            background: rgba(0, 123, 255, 0.1);
+        }
+        .modal {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 10px 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        input, select, textarea {
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            transition: border-color 0.3s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        .autocomplete-items {
+            position: absolute;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            max-height: 200px;
+            overflow-y: auto;
+            width: 100%;
+        }
+        .autocomplete-items div {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .autocomplete-items div:hover {
+            background: rgba(0, 123, 255, 0.1);
+        }
+        #loading-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            z-index: 2000;
+            display: none;
+        }
+        #loading-indicator i {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Pengelolaan Komprehensif Lansia</h1>
+
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap mb-6">
+            <button class="tab-btn px-4 py-2" data-tab="personal">Data Pribadi</button>
+            <button class="tab-btn px-4 py-2" data-tab="health">Kesehatan</button>
+            <button class="tab-btn px-4 py-2" data-tab="finance">Keuangan</button>
+            <button class="tab-btn px-4 py-2" data-tab="activity">Kegiatan</button>
+            <button class="tab-btn px-4 py-2" data-tab="policy">Kebijakan</button>
+            <button class="tab-btn px-4 py-2" data-tab="rehabilitation">Rehabilitasi</button>
+            <button class="tab-btn px-4 py-2" data-tab="monitoring">Pemantauan</button>
+            <button class="tab-btn px-4 py-2" data-tab="partnership">Kemitraan</button>
+            <button class="tab-btn px-4 py-2" data-tab="balai">Balai</button>
+            <button class="tab-btn px-4 py-2" data-tab="disaster">Bencana</button>
+            <button class="tab-btn px-4 py-2" data-tab="productive">Lansia Produktif</button>
+            <button class="tab-btn px-4 py-2" data-tab="advocacy">Advokasi</button>
+            <button class="tab-btn px-4 py-2" data-tab="hlun">HLUN</button>
+            <button class="tab-btn px-4 py-2" data-tab="training">Pelatihan</button>
+            <button class="tab-btn px-4 py-2" data-tab="research">Penelitian</button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mb-6 flex space-x-4">
+            <button id="input-btn" class="action-btn"><i class="fas fa-plus mr-2"></i> Input Data</button>
+            <button id="summary-btn" class="action-btn"><i class="fas fa-chart-bar mr-2"></i> Ringkasan</button>
+            <button id="export-btn" class="action-btn"><i class="fas fa-file-export mr-2"></i> Ekspor</button>
+            <button id="help-btn" class="action-btn"><i class="fas fa-question-circle mr-2"></i> Bantuan</button>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="hidden">
+            <i class="fas fa-spinner fa-2x text-blue-600"></i>
+            <span class="ml-2 text-gray-800">Memuat...</span>
+        </div>
+
+        <!-- Map and Stats -->
+        <div class="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6 mb-6">
+            <div class="w-full md:w-1/2 card">
+                <div id="map"></div>
+            </div>
+            <div class="w-full md:w-1/2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="card">
+                    <h3 class="font-bold text-gray-800">Total Lansia</h3>
+                    <p id="total-lansia" class="text-2xl text-blue-600">0</p>
+                </div>
+                <div class="card">
+                    <h3 class="font-bold text-gray-800">Lansia DTKS</h3>
+                    <p id="lansia-dtks" class="text-2xl text-blue-600">0</p>
+                </div>
+                <div class="card">
+                    <h3 class="font-bold text-gray-800">Bantuan Terkini</h3>
+                    <p id="bantuan-terkini" class="text-2xl text-blue-600">-</p>
+                </div>
+                <div class="card">
+                    <h3 class="font-bold text-gray-800">Kegiatan Terjadwal</h3>
+                    <p id="kegiatan-terjadwal" class="text-2xl text-blue-600">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="card mb-6">
+            <canvas id="usia-chart" class="w-full h-64"></canvas>
+        </div>
+
+        <!-- Notification -->
+        <div id="notification" class="notification hidden"></div>
+
+        <!-- Main Table -->
+        <div class="card mb-6">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Daftar Lansia</h2>
+            <table id="main-table" class="w-full border-collapse display">
+                <thead>
+                    <tr>
+                        <th class="text-left">No</th>
+                        <th class="text-left">NIK</th>
+                        <th class="text-left">Nama</th>
+                        <th class="text-left">Usia</th>
+                        <th class="text-left">Status Sosial</th>
+                        <th class="text-left">Alamat</th>
+                        <th class="text-left">Keluarga</th>
+                        <th class="text-left">Tempat Tinggal</th>
+                        <th class="text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Tab Contents -->
+        <div id="personal-tab" class="tab-content card hidden">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Input Data Pribadi</h2>
+            <form id="personal-form" class="space-y-4">
+                <input type="hidden" id="edit-nik">
+                <div>
+                    <label class="block text-gray-700">NIK</label>
+                    <input type="text" id="nik" class="w-full" maxlength="16" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Nama</label>
+                    <input type="text" id="nama" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Usia</label>
+                    <input type="number" id="usia" class="w-full" required min="60">
+                </div>
+                <div>
+                    <label class="block text-gray-700">Status Sosial</label>
+                    <select id="status_sosial" class="w-full" required>
+                        <option value="Mampu">Mampu</option>
+                        <option value="Kurang Mampu">Kurang Mampu</option>
+                        <option value="DTKS">DTKS</option>
+                    </select>
+                </div>
+                <div class="relative">
+                    <label class="block text-gray-700">Alamat</label>
+                    <input type="text" id="alamat" class="w-full" required>
+                    <div id="autocomplete-items" class="autocomplete-items hidden"></div>
+                    <button type="button" id="cari-koordinat" class="action-btn mt-2"><i class="fas fa-map-marker-alt mr-2"></i> Cari Koordinat</button>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Latitude</label>
+                    <input type="number" id="latitude" class="w-full" step="any" readonly>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Longitude</label>
+                    <input type="number" id="longitude" class="w-full" step="any" readonly>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Keluarga (Nama, Hubungan, Kontak)</label>
+                    <input type="text" id="keluarga" class="w-full" placeholder="Contoh: Budi, Anak, 08123456789">
+                </div>
+                <div>
+                    <label class="block text-gray-700">Tempat Tinggal</label>
+                    <select id="tempat_tinggal" class="w-full" required>
+                        <option value="Rumah Pribadi">Rumah Pribadi</option>
+                        <option value="Panti">Panti</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" id="simpan-personal-btn" class="action-btn"><i class="fas fa-save mr-2"></i> Simpan</button>
+                    <button type="button" id="cancel-edit-btn" class="action-btn hidden"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="health-tab" class="tab-content card hidden">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Data Kesehatan</h2>
+            <div class="mb-4 flex space-x-2">
+                <label class="block text-gray-700">Filter Tanggal</label>
+                <input type="date" id="health-start-date" class="p-2">
+                <input type="date" id="health-end-date" class="p-2">
+                <button id="filter-health-btn" class="action-btn"><i class="fas fa-filter mr-2"></i> Filter</button>
+            </div>
+            <form id="health-form" class="space-y-4">
+                <input type="hidden" id="health-edit-id">
+                <div>
+                    <label class="block text-gray-700">NIK Lansia</label>
+                    <input type="text" id="health-nik" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Penyakit</label>
+                    <input type="text" id="penyakit" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Tanggal Diagnosis</label>
+                    <input type="date" id="tanggal_diagnosis" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Jadwal Periksa</label>
+                    <input type="date" id="jadwal_periksa" class="w-full" required>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" id="simpan-health-btn" class="action-btn"><i class="fas fa-save mr-2"></i> Tambah</button>
+                    <button type="button" id="cancel-health-edit-btn" class="action-btn hidden"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </form>
+            <table id="health-table" class="w-full border-collapse mt-4 display">
+                <thead>
+                    <tr>
+                        <th class="text-left">No</th>
+                        <th class="text-left">Penyakit</th>
+                        <th class="text-left">Tanggal Diagnosis</th>
+                        <th class="text-left">Jadwal Periksa</th>
+                        <th class="text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="finance-tab" class="tab-content card hidden">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Data Keuangan</h2>
+            <form id="finance-form" class="space-y-4">
+                <input type="hidden" id="finance-edit-id">
+                <div>
+                    <label class="block text-gray-700">NIK Lansia</label>
+                    <input type="text" id="finance-nik" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Jenis Bantuan</label>
+                    <input type="text" id="jenis_bantuan" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Jumlah (Rp)</label>
+                    <input type="number" id="jumlah_bantuan" class="w-full" required min="0">
+                </div>
+                <div>
+                    <label class="block text-gray-700">Tanggal</label>
+                    <input type="date" id="tanggal_bantuan" class="w-full" required>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" id="simpan-finance-btn" class="action-btn"><i class="fas fa-save mr-2"></i> Tambah</button>
+                    <button type="button" id="cancel-finance-edit-btn" class="action-btn hidden"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </form>
+            <table id="finance-table" class="w-full border-collapse mt-4 display">
+                <thead>
+                    <tr>
+                        <th class="text-left">No</th>
+                        <th class="text-left">Jenis Bantuan</th>
+                        <th class="text-left">Jumlah</th>
+                        <th class="text-left">Tanggal</th>
+                        <th class="text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="activity-tab" class="tab-content card hidden">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Data Kegiatan</h2>
+            <form id="activity-form" class="space-y-4">
+                <input type="hidden" id="activity-edit-id">
+                <div>
+                    <label class="block text-gray-700">NIK Lansia</label>
+                    <input type="text" id="activity-nik" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Nama Kegiatan</label>
+                    <input type="text" id="nama_kegiatan" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Tanggal</label>
+                    <input type="date" id="tanggal_kegiatan" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Status</label>
+                    <select id="status_kegiatan" class="w-full" required>
+                        <option value="Terjadwal">Terjadwal</option>
+                        <option value="Selesai">Selesai</option>
+                        <option value="Batal">Batal</option>
+                    </select>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" id="simpan-activity-btn" class="action-btn"><i class="fas fa-save mr-2"></i> Tambah</button>
+                    <button type="button" id="cancel-activity-edit-btn" class="action-btn hidden"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </form>
+            <div id="calendar" class="mt-4 text-center text-gray-700">Kalender akan menampilkan kegiatan (implementasi penuh memerlukan library kalender)</div>
+        </div>
+
+        <div id="policy-tab" class="tab-content card hidden">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Data Kebijakan</h2>
+            <form id="policy-form" class="space-y-4">
+                <input type="hidden" id="policy-edit-id">
+                <div>
+                    <label class="block text-gray-700">Judul Kebijakan</label>
+                    <input type="text" id="judul_kebijakan" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Deskripsi</label>
+                    <textarea id="deskripsi_kebijakan" class="w-full" required></textarea>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" id="simpan-policy-btn" class="action-btn"><i class="fas fa-save mr-2"></i> Simpan</button>
+                    <button type="button" id="cancel-policy-edit-btn" class="action-btn hidden"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </form>
+            <table id="policy-table" class="w-full border-collapse mt-4 display">
+                <thead>
+                    <tr>
+                        <th class="text-left">No</th>
+                        <th class="text-left">Judul</th>
+                        <th class="text-left">Deskripsi</th>
+                        <th class="text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="rehabilitation-tab" class="tab-content card hidden">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Data Rehabilitasi</h2>
+            <form id="rehabilitation-form" class="space-y-4">
+                <input type="hidden" id="rehabilitation-edit-id">
+                <div>
+                    <label class="block text-gray-700">Nama Balai</label>
+                    <input type="text" id="nama_balai" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Layanan</label>
+                    <input type="text" id="layanan_balai" class="w-full" required>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" id="simpan-rehabilitation-btn" class="action-btn"><i class="fas fa-save mr-2"></i> Simpan</button>
+                    <button type="button" id="cancel-rehabilitation-edit-btn" class="action-btn hidden"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </form>
+            <table id="rehabilitation-table" class="w-full border-collapse mt-4 display">
+                <thead>
+                    <tr>
+                        <th class="text-left">No</th>
+                        <th class="text-left">Nama Balai</th>
+                        <th class="text-left">Layanan</th>
+                        <th class="text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="monitoring-tab" class="tab-content card hidden">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Data Pemantauan</h2>
+            <form id="monitoring-form" class="space-y-4">
+                <input type="hidden" id="monitoring-edit-id">
+                <div>
+                    <label class="block text-gray-700">Nama Program</label>
+                    <input type="text" id="nama_program" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Progres</label>
+                    <input type="text" id="progres_program" class="w-full" required>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" id="simpan-monitoring-btn" class="action-btn"><i class="fas fa-save mr-2"></i> Simpan</button>
+                    <button type="button" id="cancel-monitoring-edit-btn" class="action-btn hidden"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </form>
+            <table id="monitoring-table" class="w-full border-collapse mt-4 display">
+                <thead>
+                    <tr>
+                        <th class="text-left">No</th>
+                        <th class="text-left">Program</th>
+                        <th class="text-left">Progres</th>
+                        <th class="text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="partnership-tab" class="tab-content card hidden">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Data Kemitraan</h2>
+            <form id="partnership-form" class="space-y-4">
+                <input type="hidden" id="partnership-edit-id">
+                <div>
+                    <label class="block text-gray-700">Nama Mitra</label>
+                    <input type="text" id="nama_mitra" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Kontak</label>
+                    <input type="text" id="kontak_mitra" class="w-full" required>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" id="simpan-partnership-btn" class="action-btn"><i class="fas fa-save mr-2"></i> Simpan</button>
+                    <button type="button" id="cancel-partnership-edit-btn" class="action-btn hidden"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </form>
+            <table id="partnership-table" class="w-full border-collapse mt-4 display">
+                <thead>
+                    <tr>
+                        <th class="text-left">No</th>
+                        <th class="text-left">Nama Mitra</th>
+                        <th class="text-left">Kontak</th>
+                        <th class="text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="balai-tab" class="tab-content card hidden">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Data Balai</h2>
+            <form id="balai-form" class="space-y-4">
+                <input type="hidden" id="balai-edit-id">
+                <div>
+                    <label class="block text-gray-700">Nama Sentra</label>
+                    <input type="text" id="nama_sentra" class="w-full" required>
+                </div>
+                <div class="relative">
+                    <label class="block text-gray-700">Lokasi</label>
+                    <input type="text" id="lokasi_sentra" class="w-full" required>
+                    <div id="autocomplete-items-sentra" class="autocomplete-items hidden"></div>
+                    <button type="button" id="cari-koordinat-sentra" class="action-btn mt-2"><i class="fas fa-map-marker-alt mr-2"></i> Cari Koordinat</button>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Latitude</label>
+                    <input type="number" id="latitude_sentra" class="w-full" step="any" readonly>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Longitude</label>
+                    <input type="number" id="longitude_sentra" class="w-full" step="any" readonly>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Layanan</label>
+                    <input type="text" id="layanan_sentra" class="w-full" required>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" id="simpan-balai-btn" class="action-btn"><i class="fas fa-save mr-2"></i> Simpan</button>
+                    <button type="button" id="cancel-balai-edit-btn" class="action-btn hidden"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </form>
+            <table id="balai-table" class="w-full border-collapse mt-4 display">
+                <thead>
+                    <tr>
+                        <th class="text-left">No</th>
+                        <th class="text-left">Nama Sentra</th>
+                        <th class="text-left">Lokasi</th>
+                        <th class="text-left">Layanan</th>
+                        <th class="text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="disaster-tab" class="tab-content card hidden">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Data Bencana</h2>
+            <form id="disaster-form" class="space-y-4">
+                <input type="hidden" id="disaster-edit-id">
+                <div>
+                    <label class="block text-gray-700">Kejadian</label>
+                    <input type="text" id="kejadian_bencana" class="w-full" required>
+                </div>
+                <div class="relative">
+                    <label class="block text-gray-700">Lokasi</label>
+                    <input type="text" id="lokasi_bencana" class="w-full" required>
+                    <div id="autocomplete-items-bencana" class="autocomplete-items hidden"></div>
+                    <button type="button" id="cari-koordinat-bencana" class="action-btn mt-2"><i class="fas fa-map-marker-alt mr-2"></i> Cari Koordinat</button>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Latitude</label>
+                    <input type="number" id="latitude_bencana" class="w-full" step="any" readonly>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Longitude</label>
+                    <input type="number" id="longitude_bencana" class="w-full" step="any" readonly>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Kebutuhan</label>
+                    <input type="text" id="kebutuhan_bencana" class="w-full" required>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" id="simpan-disaster-btn" class="action-btn"><i class="fas fa-save mr-2"></i> Simpan</button>
+                    <button type="button" id="cancel-disaster-edit-btn" class="action-btn hidden"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </form>
+            <table id="disaster-table" class="w-full border-collapse mt-4 display">
+                <thead>
+                    <tr>
+                        <th class="text-left">No</th>
+                        <th class="text-left">Kejadian</th>
+                        <th class="text-left">Lokasi</th>
+                        <th class="text-left">Kebutuhan</th>
+                        <th class="text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="productive-tab" class="tab-content card hidden">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Data Lansia Produktif</h2>
+            <form id="productive-form" class="space-y-4">
+                <input type="hidden" id="productive-edit-id">
+                <div>
+                    <label class="block text-gray-700">Nama Pelatihan</label>
+                    <input type="text" id="nama_pelatihan" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Tanggal</label>
+                    <input type="date" id="tanggal_pelatihan" class="w-full" required>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" id="simpan-productive-btn" class="action-btn"><i class="fas fa-save mr-2"></i> Simpan</button>
+                    <button type="button" id="cancel-productive-edit-btn" class="action-btn hidden"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </form>
+            <table id="productive-table" class="w-full border-collapse mt-4 display">
+                <thead>
+                    <tr>
+                        <th class="text-left">No</th>
+                        <th class="text-left">Nama Pelatihan</th>
+                        <th class="text-left">Tanggal</th>
+                        <th class="text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="advocacy-tab" class="tab-content card hidden">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Data Advokasi</h2>
+            <form id="advocacy-form" class="space-y-4">
+                <input type="hidden" id="advocacy-edit-id">
+                <div>
+                    <label class="block text-gray-700">Nama Kampanye</label>
+                    <input type="text" id="nama_kampanye" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Jadwal</label>
+                    <input type="date" id="jadwal_kampanye" class="w-full" required>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" id="simpan-advocacy-btn" class="action-btn"><i class="fas fa-save mr-2"></i> Simpan</button>
+                    <button type="button" id="cancel-advocacy-edit-btn" class="action-btn hidden"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </form>
+            <table id="advocacy-table" class="w-full border-collapse mt-4 display">
+                <thead>
+                    <tr>
+                        <th class="text-left">No</th>
+                        <th class="text-left">Nama Kampanye</th>
+                        <th class="text-left">Jadwal</th>
+                        <th class="text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="hlun-tab" class="tab-content card hidden">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Data HLUN</h2>
+            <form id="hlun-form" class="space-y-4">
+                <input type="hidden" id="hlun-edit-id">
+                <div>
+                    <label class="block text-gray-700">Nama Kegiatan HLUN</label>
+                    <input type="text" id="nama_hlun" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Tanggal</label>
+                    <input type="date" id="tanggal_hlun" class="w-full" required>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" id="simpan-hlun-btn" class="action-btn"><i class="fas fa-save mr-2"></i> Simpan</button>
+                    <button type="button" id="cancel-hlun-edit-btn" class="action-btn hidden"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </form>
+            <table id="hlun-table" class="w-full border-collapse mt-4 display">
+                <thead>
+                    <tr>
+                        <th class="text-left">No</th>
+                        <th class="text-left">Nama Kegiatan</th>
+                        <th class="text-left">Tanggal</th>
+                        <th class="text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="training-tab" class="tab-content card hidden">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Data Pelatihan</h2>
+            <form id="training-form" class="space-y-4">
+                <input type="hidden" id="training-edit-id">
+                <div>
+                    <label class="block text-gray-700">Nama Pelatihan</label>
+                    <input type="text" id="nama_training" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Tanggal</label>
+                    <input type="date" id="tanggal_training" class="w-full" required>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" id="simpan-training-btn" class="action-btn"><i class="fas fa-save mr-2"></i> Simpan</button>
+                    <button type="button" id="cancel-training-edit-btn" class="action-btn hidden"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </form>
+            <table id="training-table" class="w-full border-collapse mt-4 display">
+                <thead>
+                    <tr>
+                        <th class="text-left">No</th>
+                        <th class="text-left">Nama Pelatihan</th>
+                        <th class="text-left">Tanggal</th>
+                        <th class="text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="research-tab" class="tab-content card hidden">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Data Penelitian</h2>
+            <form id="research-form" class="space-y-4">
+                <input type="hidden" id="research-edit-id">
+                <div>
+                    <label class="block text-gray-700">Judul Penelitian</label>
+                    <input type="text" id="judul_penelitian" class="w-full" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700">Ringkasan</label>
+                    <textarea id="ringkasan_penelitian" class="w-full" required></textarea>
+                </div>
+                <div class="flex space-x-4">
+                    <button type="submit" id="simpan-research-btn" class="action-btn"><i class="fas fa-save mr-2"></i> Simpan</button>
+                    <button type="button" id="cancel-research-edit-btn" class="action-btn hidden"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </form>
+            <table id="research-table" class="w-full border-collapse mt-4 display">
+                <thead>
+                    <tr>
+                        <th class="text-left">No</th>
+                        <th class="text-left">Judul</th>
+                        <th class="text-left">Ringkasan</th>
+                        <th class="text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Help Modal -->
+        <div id="help-modal" class="modal fixed inset-0 flex items-center justify-center hidden">
+            <div class="modal-content p-6 max-w-md w-full">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Petunjuk Penggunaan</h2>
+                <p class="text-gray-700">Gunakan tab navigasi untuk mengelola data lansia. Klik "Input Data" untuk menambahkan lansia baru, "Ringkasan" untuk melihat statistik, dan "Ekspor" untuk mengunduh data dalam format PDF.</p>
+                <button id="close-help-btn" class="action-btn mt-4"><i class="fas fa-times mr-2"></i> Tutup</button>
+            </div>
+        </div>
+
+        <!-- Summary Modal -->
+        <div id="summary-modal" class="modal fixed inset-0 flex items-center justify-center hidden">
+            <div class="modal-content p-6 max-w-md w-full">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Ringkasan Data</h2>
+                <div id="summary-content" class="text-gray-700"></div>
+                <button id="close-summary-btn" class="action-btn mt-4"><i class="fas fa-times mr-2"></i> Tutup</button>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div id="delete-confirm-modal" class="modal fixed inset-0 flex items-center justify-center hidden">
+            <div class="modal-content p-6 max-w-md w-full">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Konfirmasi Penghapusan</h2>
+                <p class="text-gray-700">Apakah Anda yakin ingin menghapus data ini?</p>
+                <div class="flex space-x-4 mt-4">
+                    <button id="confirm-delete-btn" class="action-btn bg-red-500 text-white"><i class="fas fa-trash mr-2"></i> Hapus</button>
+                    <button id="cancel-delete-btn" class="action-btn"><i class="fas fa-times mr-2"></i> Batal</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Debugging Script -->
+        <script>
+            console.log('Initializing page at ' + new Date().toLocaleString());
+
+            // Verify JavaScript files loaded
+            const scripts = [
+                '/static/js/rbac.js',
+                '/static/js/lansia_komprehensif.js',
+                '/static/js/lansia_komprehensif_tables.js',
+                '/static/js/lansia_komprehensif_handlers.js',
+                '/static/js/lansia_komprehensif_handlers_policy.js',
+                '/static/js/lansia_komprehensif_handlers_utils.js'
+            ];
+            scripts.forEach(src => {
+                const script = document.querySelector(`script[src="${src}"]`);
+                if (script) {
+                    console.log(`Script ${src} loaded`);
+                } else {
+                    console.error(`Script ${src} not found`);
+                }
+            });
+
+            // Verify button elements
+            const buttons = document.querySelectorAll('.tab-btn, .action-btn');
+            buttons.forEach(btn => {
+                console.log(`Button ${btn.id || btn.dataset.tab} found`);
+                btn.addEventListener('click', () => {
+                    console.log(`Button ${btn.id || btn.dataset.tab} clicked`);
+                });
+            });
+
+            // Verify key functions
+            const requiredFunctions = [
+                'initMap', 'fetchUserInfo', 'loadData', 'updateMainTable', 'updateMap', 'updateStats',
+                'updateHealthTable', 'updateFinanceTable', 'initCalendar', 'updatePolicyTable',
+                'updateRehabilitationTable', 'updateMonitoringTable', 'updatePartnershipTable',
+                'updateSentraTable', 'updateDisasterTable', 'updateProductiveTable', 'updateAdvocacyTable',
+                'updateHlunTable', 'updateTrainingTable', 'updateResearchTable', 'showNotification',
+                'showLoading', 'cariKoordinat', 'setupAutocomplete', 'handlePersonalFormSubmit',
+                'handleHealthFormSubmit', 'handleFinanceFormSubmit', 'handleActivityFormSubmit',
+                'handlePolicyFormSubmit', 'handleRehabilitationFormSubmit', 'handleMonitoringFormSubmit',
+                'handlePartnershipFormSubmit', 'handleSentraFormSubmit', 'handleDisasterFormSubmit',
+                'handleProductiveFormSubmit', 'handleAdvocacyFormSubmit', 'handleHlunFormSubmit',
+                'handleTrainingFormSubmit', 'handleResearchFormSubmit', 'handleEditLansia',
+                'handleEditHealth', 'handleEditFinance', 'handleEditActivity', 'handleEditPolicy',
+                'handleEditRehabilitation', 'handleEditMonitoring', 'handleEditPartnership',
+                'handleEditSentra', 'handleEditDisaster', 'handleEditProductive', 'handleEditAdvocacy',
+                'handleEditHlun', 'handleEditTraining', 'handleEditResearch', 'updateTabContent',
+                'exportToCSV', 'exportToExcel', 'exportToPDF', 'showSummary', 'handleHealthFilter',
+                'attachButtonListeners', 'confirmDelete'
+            ];
+            requiredFunctions.forEach(func => {
+                if (typeof window[func] === 'function') {
+                    console.log(`Function ${func} found`);
+                } else {
+                    console.error(`Function ${func} not found`);
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>
