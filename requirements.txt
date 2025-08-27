@@ -4,3 +4,4 @@ flask-login
 werkzeug
 requests
 gunicorn
+python-dotenv
