@@ -16,9 +16,15 @@ load_dotenv()
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+# Path database portable (bisa Linux/Windows/Cloud)
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+db_path = os.path.join(BASE_DIR, "data", "webgis.db")
+
 # Konfigurasi dari .env
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "default-secret")
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data/webgis.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+    "DATABASE_URL", f"sqlite:///{db_path}"
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['BREVO_API_KEY'] = os.getenv("BREVO_API_KEY")
 app.config['BREVO_SENDER_EMAIL'] = os.getenv("BREVO_SENDER_EMAIL")
@@ -36,9 +42,9 @@ app.config['SESSION_REFRESH_EACH_REQUEST'] = True
 if not os.path.exists("logs"):
     os.makedirs("logs")
 logging.basicConfig(
-    filename='logs/app.log',
+    filename=os.path.join("logs", "app.log"),
     level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -48,7 +54,7 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'auth.login'
 jwt = JWTManager(app)
 
-# Import model agar bisa dibuat di DB
+# Import models agar bisa dibuat di DB
 with app.app_context():
     db.create_all()
 
@@ -59,19 +65,18 @@ app.register_blueprint(auth_bp, url_prefix="/auth")
 app.register_blueprint(main_bp)
 
 # SocketIO event
-@socketio.on('connect')
+@socketio.on("connect")
 def handle_connect():
     logger.info("Client connected via SocketIO")
     print("Client connected")
 
-@socketio.on('disconnect')
+@socketio.on("disconnect")
 def handle_disconnect():
     logger.info("Client disconnected from SocketIO")
     print("Client disconnected")
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)
-
 
 DATA_BANSOS_FILE = os.path.join(os.path.dirname(__file__), 'data', 'penerima.json')
 DATA_BENCANA_FILE = os.path.join(os.path.dirname(__file__), 'data', 'bencana.json')
