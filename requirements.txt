@@ -1,9 +1,10 @@
 flask
 flask-sqlalchemy
 flask-login
-werkzeug
-requests
-gunicorn
-python-dotenv
 flask-jwt-extended
 flask-socketio
+python-dotenv
+requests
+werkzeug
+python-socketio
+engineio
