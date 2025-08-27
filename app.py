@@ -1325,9 +1325,7 @@ def logout():
     return redirect(url_for('auth', tab='login'))
 
 if __name__ == '__main__':
-    db.init_app(app)
-    login_manager.init_app(app)
-    os.makedirs('C:/webgis-bansos/logs', exist_ok=True)
+    os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
     with app.app_context():
         db.create_all()
         if not db.session.execute(db.select(Region)).scalars().first():
