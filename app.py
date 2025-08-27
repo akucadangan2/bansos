@@ -7,7 +7,7 @@ import time
 import secrets
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-from flask import Flask, Blueprint, jsonify, render_template, request, flash, redirect, url_for, session, current_user
+from flask import Flask, Blueprint, jsonify, render_template, request, flash, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from flask_jwt_extended import JWTManager
