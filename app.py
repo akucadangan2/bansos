@@ -14,7 +14,7 @@ load_dotenv()
 
 # Inisialisasi Flask
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, async_mode='threading')  # jangan pakai eventlet/gevent di Streamlit
 
 # Path database portable (bisa Linux/Windows/Cloud)
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -77,9 +77,6 @@ def handle_connect():
 def handle_disconnect():
     logger.info("Client disconnected from SocketIO")
     print("Client disconnected")
-
-if __name__ == "__main__":
-    socketio.run(app, debug=True)
 
 DATA_BANSOS_FILE = os.path.join(os.path.dirname(__file__), 'data', 'penerima.json')
 DATA_BENCANA_FILE = os.path.join(os.path.dirname(__file__), 'data', 'bencana.json')
