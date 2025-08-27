@@ -1,41 +1,105 @@
 import os
+import logging
+from datetime import timedelta
+
 from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_jwt_extended import JWTManager
 from flask_socketio import SocketIO
-from datetime import timedelta
-import logging
 
-# load environment variables
+# ============================================================
+# 1. Load Environment Variables
+# ============================================================
 load_dotenv()
 
+# ============================================================
+# 2. Initialize Flask App
+# ============================================================
 app = Flask(__name__)
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins="*")  # agar bisa akses dari frontend
 
-# Config dari .env
+# ============================================================
+# 3. Configuration
+# ============================================================
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "default-secret")
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:/webgis-bansos/data/webgis.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+    "DATABASE_URL", "sqlite:///C:/webgis-bansos/data/webgis.db"
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Brevo / Email
 app.config['BREVO_API_KEY'] = os.getenv("BREVO_API_KEY")
 app.config['BREVO_SENDER_EMAIL'] = os.getenv("BREVO_SENDER_EMAIL")
+
+# Session
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = False
+app.config['SESSION_COOKIE_SECURE'] = False  # set True kalau pakai HTTPS
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
 app.config['SESSION_REFRESH_EACH_REQUEST'] = True
+
+# API Keys
 app.config['MAPBOX_API_KEY'] = os.getenv("MAPBOX_API_KEY")
-app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY")
 
-JWT = JWTManager(app)
+# JWT
+app.config['JWT_SECRET_KEY'] = os.getenv("JWT_SECRET_KEY", "jwt-secret")
 
-db = SQLAlchemy()
-login_manager = LoginManager()
-login_manager.login_view = 'auth'
+# ============================================================
+# 4. Extensions
+# ============================================================
+db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'auth.login'  # route login
+jwt = JWTManager(app)
 
-logging.basicConfig(filename='C:/webgis-bansos/logs/app.log', level=logging.DEBUG)
+# ============================================================
+# 5. Logging
+# ============================================================
+log_dir = "C:/webgis-bansos/logs"
+os.makedirs(log_dir, exist_ok=True)
+logging.basicConfig(
+    filename=os.path.join(log_dir, 'app.log'),
+    level=logging.DEBUG,
+    format='%(asctime)s [%(levelname)s] %(message)s'
+)
 logger = logging.getLogger(__name__)
+
+# ============================================================
+# 6. Models
+# ============================================================
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+
+    def __repr__(self):
+        return f"<User {self.username}>"
+
+
+# ============================================================
+# 7. Blueprints / Routes
+# ============================================================
+@app.route("/")
+def index():
+    return {"message": "Welcome to WebGIS Bansos API"}
+
+
+@app.route("/ping")
+def ping():
+    return {"status": "ok"}
+
+
+# ============================================================
+# 8. Main Entrypoint
+# ============================================================
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()  # otomatis bikin tabel kalau belum ada
+    logger.info("Starting WebGIS Bansos App...")
+    socketio.run(app, host="0.0.0.0", port=5000, debug=True)
+
 
 
 DATA_BANSOS_FILE = os.path.join(os.path.dirname(__file__), 'data', 'penerima.json')
